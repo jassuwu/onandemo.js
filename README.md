@@ -11,13 +11,19 @@ sprite sheet and it wakes up, chases your mouse, and naps when it catches you.
 
 ## use it
 
-bring a sheet (a grid of cells) and a frame map (which cells mean what):
+one tag, zero config — the classic cat:
+
+```html
+<script src="https://unpkg.com/onandemo/dist/onandemo.js"></script>
+```
+
+or bring a sheet (a grid of cells) and a frame map (which cells mean what):
 
 ```html
 <script
   src="https://unpkg.com/onandemo/dist/onandemo.js"
-  data-sheet="./cat.png"
-  data-frame-map="./cat.json"
+  data-sheet="./dino.png"
+  data-frame-map="./dino.json"
 ></script>
 ```
 
@@ -26,7 +32,8 @@ or from npm — `bun add onandemo`:
 ```ts
 import { onandemo } from "onandemo";
 
-const destroy = onandemo({ sheet: "/cat.png", frameMap });
+const destroy = onandemo(); // the cat
+onandemo({ sheet: "/dino.png", frameMap }); // anything
 ```
 
 ## the frame map
@@ -64,15 +71,15 @@ once every twenty seconds.
 
 ## the knobs
 
-| knob                 | default      | what it does                        |
-| -------------------- | ------------ | ----------------------------------- |
-| `sheet` + `frameMap` | —            | your art and its map                |
-| `preset`             | —            | bundled companion by name (roadmap) |
-| `speed`              | `10`         | chase speed in px per tick          |
-| `restRadius`         | `48`         | distance inside which it rests      |
-| `scale`              | `1`          | display multiplier                  |
-| `zIndex`             | `2147483647` | stacking                            |
-| `persist`            | `true`       | remember its position across loads  |
+| knob                 | default      | what it does                       |
+| -------------------- | ------------ | ---------------------------------- |
+| `sheet` + `frameMap` | —            | your art and its map               |
+| `preset`             | `"neko"`     | bundled companion by name          |
+| `speed`              | `10`         | chase speed in px per tick         |
+| `restRadius`         | `48`         | distance inside which it rests     |
+| `scale`              | `1`          | display multiplier                 |
+| `zIndex`             | `2147483647` | stacking                           |
+| `persist`            | `true`       | remember its position across loads |
 
 every knob is also a `data-*` attribute on the script tag (`data-speed="15"`).
 
@@ -92,11 +99,12 @@ every 100 ms the engine measures the distance to your cursor. past the rest
 radius it runs one of eight directions at `speed` px per tick — the animation
 is just `background-position` moving over your sheet, nothing else. inside the
 rest radius it idles, and after lingering it might perform an antic from your
-sheet. that is the whole engine: 6.6 KB minified, zero dependencies.
+sheet. that is the whole product: 11.6 KB minified with the cat inlined — zero
+dependencies, zero extra requests.
 
 ## roadmap
 
-- bundled presets — zero-config `onandemo()` with the classic cat homage (public-domain provenance receipts in NOTICE.md) and CC0 friends.
+- more bundled presets — CC0 friends for the cat, receipts continuing in [NOTICE.md](packages/onandemo/NOTICE.md).
 - [onandemo.jass.gg](https://onandemo.jass.gg) — live demo, a playground that slices any image into a sheet + frame map, and the recipe: a prompt you paste into your own image model to get a compliant sheet back.
 - npm `0.1.0` — the engine above is built and tested; the publish is imminent.
 - a demo gif right here.
@@ -106,6 +114,6 @@ sheet. that is the whole engine: 6.6 KB minified, zero dependencies.
 
 <div align="center">
 
-[MIT](LICENSE) · a love letter to [oneko.js](https://github.com/adryd325/oneko.js)
+[MIT](LICENSE) · sprite receipts in [NOTICE.md](packages/onandemo/NOTICE.md) · a love letter to [oneko.js](https://github.com/adryd325/oneko.js)
 
 </div>

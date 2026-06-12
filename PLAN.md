@@ -8,7 +8,7 @@ See [CONTEXT.md](CONTEXT.md) for vocabulary and [docs/adr/](docs/adr/) for decis
 
 ```
 onandemo.js/                           # turborepo (ADR-0005); bun is the runtime everywhere
-├── CONTEXT.md / PLAN.md / NOTICE.md   # docs root trio (NOTICE lands with presets, P4)
+├── CONTEXT.md / PLAN.md               # vocabulary + this plan; decisions in docs/adr/
 ├── docs/adr/                          # numbered decisions
 ├── turbo.json                         # task graph: library build → app builds
 ├── packages/
@@ -17,9 +17,10 @@ onandemo.js/                           # turborepo (ADR-0005); bun is the runtim
 │       │   ├── engine.ts              # tick loop: idle gate → alert countdown → 8-way chase (oneko's manners)
 │       │   ├── frame-map.ts           # frame map types + resolution: state → [col,row] → background-position
 │       │   ├── direction.ts           # normalized vector → "N".."NW" with ±0.5 bands (pure, unit-tested)
-│       │   └── dom.ts                 # the one impure file: div, fixed positioning, rAF gate, reduced-motion bail
+│       │   ├── dom.ts                 # the one impure file: div, fixed positioning, rAF gate, reduced-motion bail
+│       │   └── presets/               # bundled companions (neko: gif + frame map, inlined — ADR-0006)
 │       ├── index.ts                   # onandemo(options) factory → destroy(); re-exports types
-│       └── presets/                   # bundled sheets + frame maps (neko homage + CC0 friends)
+│       └── NOTICE.md                  # sprite provenance receipts (ADR-0002)
 ├── apps/
 │   ├── site/                          # Astro, static, no adapter → vercel → onandemo.jass.gg
 │   │                                  # landing (dogfoods the IIFE build) + playground island + Recipe page
