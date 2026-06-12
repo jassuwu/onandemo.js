@@ -19,12 +19,13 @@
   "files": [
     "dist",
     "index.ts",
+    "script.ts",
     "src",
     "presets",
     "LICENSE"
   ],
   "scripts": {
-    "build": "bun build ./index.ts --outdir dist --format esm --minify && bun build ./index.ts --outfile dist/onandemo.js --format iife --minify",
+    "build": "bun build ./index.ts --outdir dist --format esm --minify && bun build ./script.ts --outfile dist/onandemo.js --format iife --minify",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },

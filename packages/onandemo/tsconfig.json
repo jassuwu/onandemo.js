@@ -8,6 +8,7 @@
 
     // Bundler mode
     "moduleResolution": "bundler",
+    "types": ["bun"],
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,

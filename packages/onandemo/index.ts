@@ -1,25 +1,12 @@
 /** onandemo — oneko.js, but anything chases your cursor. */
 
-/** one tile of a sheet, addressed [col, row] from the top-left. */
-export type Cell = [col: number, row: number];
+import { mount } from "./src/dom.ts";
+import { resolveFrameMap, type FrameMap } from "./src/frame-map.ts";
 
-/** describes how a sheet animates: a uniform cell grid plus state-named cell lists. */
-export interface FrameMap {
-  /** cell size in px; a number for square cells, [width, height] otherwise. required. */
-  cellSize: number | [width: number, height: number];
-  /** state name to ordered cells; `idle` plus one run direction required, non-reserved names are antics. required. */
-  states: Record<string, Cell[]>;
-  /** auto-mirror a missing horizontal run direction with scaleX(-1). default true. */
-  mirror?: boolean;
-  /** display multiplier for cells. default 1. */
-  scale?: number;
-  /** chase speed in px per tick. default 10. */
-  speed?: number;
-  /** distance in px inside which the companion rests. default 48. */
-  restRadius?: number;
-}
+export type { Direction } from "./src/direction.ts";
+export type { Cell, FrameMap, ResolvedFrameMap } from "./src/frame-map.ts";
 
-/** the six knobs: `preset` or `sheet` + `frameMap`, then tuning. */
+/** the six knobs: `preset` or `sheet` + `frameMap`, then tuning (ADR-0009). */
 export interface OnandemoOptions {
   /** bundled companion by name. default "neko". */
   preset?: string;
@@ -29,7 +16,7 @@ export interface OnandemoOptions {
   frameMap?: FrameMap;
   /** chase speed in px per tick; overrides the frame map. default 10. */
   speed?: number;
-  /** rest distance in px; overrides the frame map. default 48. */
+  /** rest distance in px; overrides the frame map. the companion also rests within one `speed` step (oneko's overshoot guard). default 48. */
   restRadius?: number;
   /** display multiplier; overrides the frame map. default the preset's, else 1. */
   scale?: number;
@@ -39,12 +26,27 @@ export interface OnandemoOptions {
   persist?: boolean;
 }
 
-/**
- * mounts a companion that chases the cursor; returns its destroy function.
- *
- * 0.0.1 is a name-stub: types are final, the engine is not — calling it does nothing.
- */
-export function onandemo(options?: OnandemoOptions): () => void {
-  void options;
-  return () => {};
+/** mounts a companion that chases the cursor; returns its destroy function. */
+export function onandemo(options: OnandemoOptions = {}): () => void {
+  if (!options.sheet || !options.frameMap) {
+    throw new Error(
+      "onandemo: presets land soon — until then pass `sheet` and `frameMap`",
+    );
+  }
+  if (options.zIndex !== undefined && !Number.isFinite(options.zIndex)) {
+    throw new Error("onandemo: zIndex must be a finite number");
+  }
+  // user knobs ride into the frame map so resolveFrameMap validates everything once
+  const map = resolveFrameMap({
+    ...options.frameMap,
+    speed: options.speed ?? options.frameMap.speed,
+    restRadius: options.restRadius ?? options.frameMap.restRadius,
+    scale: options.scale ?? options.frameMap.scale,
+  });
+  return mount({
+    sheet: options.sheet,
+    map,
+    zIndex: options.zIndex ?? 2147483647,
+    persist: options.persist ?? true,
+  });
 }
