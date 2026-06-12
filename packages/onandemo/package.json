@@ -22,7 +22,8 @@
     "script.ts",
     "src",
     "presets",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE.md"
   ],
   "scripts": {
     "build": "bun build ./index.ts --outdir dist --format esm --minify && bun build ./script.ts --outfile dist/onandemo.js --format iife --minify",
