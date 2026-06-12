@@ -28,20 +28,34 @@ async function init(): Promise<void> {
   if (zIndex !== undefined) options.zIndex = zIndex;
   if (d["persist"] !== undefined) options.persist = d["persist"] !== "false";
 
-  if (d["sheet"] !== undefined || d["frameMap"] !== undefined) {
-    if (d["sheet"] === undefined || d["frameMap"] === undefined) {
-      console.warn("onandemo: data-sheet and data-frame-map come together");
-      return;
-    }
-    // bring-your-own paths resolve against the page, like any asset it names
-    options.sheet = new URL(d["sheet"], document.baseURI).href;
-    const res = await fetch(new URL(d["frameMap"], document.baseURI));
+  if (d["frameMap"] !== undefined) {
+    // bring-your-own: data-frame-map points at a bare frame map or at a
+    // preset-shaped { sheet, frameMap } file (the playground exports those)
+    const mapUrl = new URL(d["frameMap"], document.baseURI);
+    const res = await fetch(mapUrl);
     if (!res.ok) {
       throw new Error(
         `onandemo: could not fetch frame map ${d["frameMap"]} (${res.status})`,
       );
     }
-    options.frameMap = (await res.json()) as FrameMap;
+    const json = (await res.json()) as
+      | FrameMap
+      | { sheet?: string; frameMap: FrameMap };
+    const wrapped = "frameMap" in json ? json : null;
+    options.frameMap = wrapped ? wrapped.frameMap : (json as FrameMap);
+    if (d["sheet"] !== undefined) {
+      // an explicit sheet resolves against the page, like any asset it names
+      options.sheet = new URL(d["sheet"], document.baseURI).href;
+    } else if (wrapped?.sheet) {
+      // a sheet named by the file resolves next to the file
+      options.sheet = new URL(wrapped.sheet, mapUrl).href;
+    } else {
+      console.warn("onandemo: the frame map names no sheet — add data-sheet");
+      return;
+    }
+  } else if (d["sheet"] !== undefined) {
+    console.warn("onandemo: data-sheet needs a data-frame-map");
+    return;
   } else if (d["preset"] !== undefined && d["preset"] !== "neko") {
     // package presets resolve relative to the script itself (ADR-0006): the
     // same unpkg/jsdelivr/self-hosted copy serves its own preset files
