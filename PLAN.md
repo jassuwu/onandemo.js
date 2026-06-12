@@ -31,7 +31,7 @@ onandemo.js/                           # turborepo (ADR-0005); bun is the runtim
 
 - **P1 — Docs.** CONTEXT / PLAN / ADR 0001–0003. ✅
 - **P2 — Scaffold.** turborepo + bun workspaces (packages/onandemo, apps/site, apps/remotion); prettier, tsconfig, CLAUDE.md bun rules; ESM + IIFE build like liquid-glass-cursor; publish the `onandemo` 0.0.1 name-stub (ADR-0008).
-- **P3 — Core.** engine / frame-map / direction as pure modules with bun test; oneko parity pinned to its constants (48 px rest radius, 10 px/tick, alert countdown, 1-in-200 antic odds).
+- **P3 — Core.** engine / frame-map / direction as pure modules with bun test; oneko parity pinned to its constants (48 px rest radius, 10 px/tick, alert countdown, 1-in-200 antic odds). ✅
 - **P4 — Presets.** neko homage + 2–3 CC0 characters; NOTICE.md provenance (ADR-0002); neko inlined, the rest as package files resolved relative to the script (ADR-0006).
 - **P5 — Site.** fonts + theme tokens, then Astro static (no adapter): landing that dogfoods the IIFE build, playground island (slice → assign states → export frame map), Recipe page; deploy to onandemo.jass.gg.
 - **P6 — Identity.** mark in scripts/art.ts → favicons / PWA set / seeded byte-stable OG card.

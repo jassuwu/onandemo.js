@@ -20,7 +20,7 @@ presets can't pass makes "anything" false on day one.
 The minimum frame map is **`idle` plus at least one run direction**. Everything else
 degrades at load time, never per tick:
 
-- Direction ladder: 8 directions → as-is; 4 → diagonals snap, horizontal wins (NE plays E); 2 → vertical motion plays the nearest horizontal; 1 → the missing horizontal is auto-mirrored with `scaleX(-1)`, with `mirror: false` as the opt-out for asymmetric art.
+- Direction ladder, resolved per missing direction in rung order: exact cells → mirrored opposite (`scaleX(-1)`; diagonals mirror before any snap, NE↔NW) → its horizontal (diagonals snap, horizontal wins: NE plays E) → mirrored horizontal → its vertical (NE plays N when no horizontal resolves) → any present direction, in the fixed order E, W, N, S, NE, NW, SE, SW. The last rung is what makes a vertical-only sheet legal under the two-state minimum. `mirror: false` opts asymmetric art out of every flipped rung.
 - Missing `alert` → no alert pause: idle straight to chase. A frozen pause with no pose reads as jank, not anticipation.
 - Antics by exclusion: any non-reserved state name is an Antic, triggered with oneko's manners. A sheet with no extra states just has a companion that never sleeps.
 
