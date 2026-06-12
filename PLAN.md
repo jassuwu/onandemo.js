@@ -36,7 +36,7 @@ onandemo.js/                           # turborepo (ADR-0005); bun is the runtim
 - **P5 — Site.** fonts + theme tokens, then Astro static (no adapter): landing that dogfoods the IIFE build, playground island (slice → assign states → export frame map), Recipe page; deploy to onandemo.jass.gg.
 - **P6 — Identity.** mark in scripts/art.ts → favicons / PWA set / seeded byte-stable OG card.
 - **P7 — Video.** Remotion hero + social from one component; choreography.ts beat sheet.
-- **P8 — Ship.** mojify-style README (land the pun); CI (fmt / test / typecheck / build); npm publish 0.1.0 as `onandemo` (semver — ADR-0008); gh repo description + homepage + topics.
+- **P8 — Ship.** README demo gif (from P7's hero) + polish; CI (fmt / test / typecheck / build); npm publish 0.1.0 as `onandemo` (semver — ADR-0008); gh repo topics.
 
 ## Deferred to v2
 
