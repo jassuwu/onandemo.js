@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "dev": "turbo dev",
     "icons": "bun run scripts/build-icons.ts",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
