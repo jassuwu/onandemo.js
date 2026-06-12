@@ -83,6 +83,18 @@ function svg(body: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}" width="${VIEW}" height="${VIEW}" shape-rendering="crispEdges">${body}</svg>`;
 }
 
+/**
+ * the mark drawn at an arbitrary origin and pixel size — for compositions
+ * larger than an icon (the OG card sets it loose on the desktop). the grid
+ * is 16×16 logical pixels; the drawn footprint is `unit * 16` square.
+ */
+export function markAt(originX: number, originY: number, unit: number): string {
+  return PIXELS.map(
+    ([x, y, color]) =>
+      `<rect x="${r(originX + x * unit)}" y="${r(originY + y * unit)}" width="${r(unit)}" height="${r(unit)}" fill="${color}"/>`,
+  ).join("");
+}
+
 /** paper tile with an ink frame — the browser-tab favicon. */
 export function faviconSvg(): string {
   return svg(
