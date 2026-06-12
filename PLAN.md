@@ -35,8 +35,8 @@ onandemo.js/                           # turborepo (ADR-0005); bun is the runtim
 - **P2 — Scaffold.** turborepo + bun workspaces (packages/onandemo, apps/site, apps/remotion); prettier, tsconfig, CLAUDE.md bun rules; ESM + IIFE build like liquid-glass-cursor; publish the `onandemo` 0.0.1 name-stub (ADR-0008).
 - **P3 — Core.** engine / frame-map / direction as pure modules with bun test; oneko parity pinned to its constants (48 px rest radius, 10 px/tick, alert countdown, 1-in-200 antic odds). ✅
 - **P4 — Presets.** neko homage + 2–3 CC0 characters; NOTICE.md provenance (ADR-0002); neko inlined, the rest as package files resolved relative to the script (ADR-0006). ✅
-- **P5 — Site.** the desktop (ADR-0010): System 7 1-bit — menu bar nav, windows, the companion roaming; playground window that **mints** companion links + `/c` viewer (ADR-0011); recipe window; registry story (CONTRIBUTING + PR path); deploy to onandemo.jass.gg. (v1 "dusk" shipped then retired by ADR-0010.)
-- **P6 — Identity.** 1-bit mark in scripts/art.ts → favicons / PWA set / OG card as a desktop screenshot (byte-stable).
+- **P5 — Site.** the desktop (ADR-0010): System 7 1-bit — menu bar nav, windows, the companion roaming; playground window that **mints** companion links + `/c` viewer (ADR-0011); recipe window; registry story (CONTRIBUTING + PR path); deploy to onandemo.jass.gg. (v1 "dusk" shipped then retired by ADR-0010.) ✅
+- **P6 — Identity.** 1-bit mark in scripts/art.ts → favicons / PWA set / OG card as a desktop screenshot (byte-stable). ✅
 - **P7 — Video.** Remotion hero + social from one component; choreography.ts beat sheet.
 - **P8 — Ship.** README demo gif (from P7's hero) + polish; CI (fmt / test / typecheck / build); npm publish 0.1.0 as `onandemo` (semver — ADR-0008); gh repo topics.
 
