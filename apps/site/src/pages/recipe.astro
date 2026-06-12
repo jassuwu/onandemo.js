@@ -1,4 +1,5 @@
 ---
+import Window from "../components/Window.astro";
 import Layout from "../layouts/Layout.astro";
 
 const placeholder = "[describe your character here]";
@@ -22,139 +23,111 @@ const [recipeBefore, recipeAfter] = recipe.split(placeholder);
   title="onandemo.js — the recipe"
   description="a prompt template you paste into your own image model to get back a sliceable sheet. onandemo never calls a model."
 >
-  <main class="mx-auto max-w-5xl px-6">
+  <main class="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
     <!-- framing -->
-    <section class="pt-16 pb-16 sm:pt-24">
-      <p class="kicker">the recipe</p>
-      <h1
-        class="mt-3 text-4xl font-bold tracking-tight text-balance sm:text-6xl"
-      >
+    <Window title="about the recipe" class="max-w-3xl">
+      <h1 class="text-4xl font-bold tracking-tight text-balance sm:text-6xl">
         bring your own model
       </h1>
-      <p class="mt-5 max-w-2xl text-lg text-faded">
+      <p class="mt-3 max-w-2xl text-lg">
         onandemo never calls a model — no key to paste, no queue to wait in. the
         recipe is a battle-tested prompt template: you paste it into whatever
         image model you already have, and the
         <a href="/playground" class="prose-link">playground</a> slices whatever comes
         back into a sheet and a frame map.
       </p>
-    </section>
-
-    <div class="dither"></div>
+    </Window>
 
     <!-- the recipe -->
-    <section class="py-16">
-      <p class="kicker">copy it</p>
-      <h2 class="mt-2 text-3xl font-semibold">the recipe, verbatim</h2>
-      <p class="mt-3 max-w-2xl text-faded">
+    <Window title="the recipe, verbatim" class="max-w-3xl">
+      <p class="max-w-2xl text-sm">
         fill in the bracket and leave the rest alone. the constraints are the
         point — they're what makes the result sliceable.
       </p>
-      <div class="pixel-card mt-8 p-5">
-        <div class="flex items-baseline justify-between gap-3">
-          <span class="font-pixel text-xs text-faded"
-            >recipe v1 — 4 cols × 3 rows, 32px cells</span
-          >
-          <button class="pixel-btn" data-copy={recipe}>copy</button>
-        </div>
-        <pre
-          class="mt-4 font-mono text-sm leading-relaxed whitespace-pre-wrap text-cream"><code>{recipeBefore}<span class="text-amber">{placeholder}</span>{recipeAfter}</code></pre>
+      <div class="mt-5 flex items-baseline justify-between gap-3">
+        <span class="label">recipe v1 — 4 cols × 3 rows, 32px cells</span>
+        <button class="btn" data-copy={recipe}>copy</button>
       </div>
-      <p class="mt-4 max-w-2xl text-sm text-faded">
-        what the rows become: row 1 is <code class="font-mono text-cream"
-          >idle</code
-        > and <code class="font-mono text-cream">alert</code>, row 2 is the run
-        facing east — missing directions mirror from there — and row 3 is a
-        sleeping antic.
+      <pre
+        class="border-ink mt-3 border-2 p-3 font-mono text-sm leading-relaxed whitespace-pre-wrap"><code>{recipeBefore}<span class="bg-amber">{placeholder}</span>{recipeAfter}</code></pre>
+      <p class="mt-3 max-w-2xl text-sm">
+        what the rows become: row 1 is <code class="font-mono">idle</code> and
+        <code class="font-mono">alert</code>, row 2 is the run facing east —
+        missing directions mirror from there — and row 3 is a sleeping antic.
       </p>
-    </section>
-
-    <div class="dither"></div>
+    </Window>
 
     <!-- steps -->
-    <section class="py-16">
-      <p class="kicker">how to use it</p>
-      <h2 class="mt-2 text-3xl font-semibold">three steps, start to chase</h2>
-      <ol class="mt-8 grid gap-6 sm:grid-cols-3">
-        <li class="pixel-card p-5">
-          <span class="font-pixel text-xs text-amber">01</span>
-          <h3 class="mt-3 font-semibold text-cream">fill in the bracket</h3>
-          <p class="mt-2 text-sm text-faded">
+    <Window title="three steps, start to chase">
+      <ol class="grid gap-6 sm:grid-cols-3">
+        <li>
+          <span class="label">01</span>
+          <h2 class="mt-2 font-bold">fill in the bracket</h2>
+          <p class="mt-2 text-sm">
             copy the recipe and replace the bracket with your character. one
             line is plenty — “a grumpy slice of toast with little legs” works.
           </p>
         </li>
-        <li class="pixel-card p-5">
-          <span class="font-pixel text-xs text-amber">02</span>
-          <h3 class="mt-3 font-semibold text-cream">
-            paste it into your model
-          </h3>
-          <p class="mt-2 text-sm text-faded">
+        <li>
+          <span class="label">02</span>
+          <h2 class="mt-2 font-bold">paste it into your model</h2>
+          <p class="mt-2 text-sm">
             whatever image model you already have. ask for a png, save what
             comes back. the constraints in the recipe do the negotiating.
           </p>
         </li>
-        <li class="pixel-card p-5">
-          <span class="font-pixel text-xs text-amber">03</span>
-          <h3 class="mt-3 font-semibold text-cream">
-            slice it in the playground
-          </h3>
-          <p class="mt-2 text-sm text-faded">
+        <li>
+          <span class="label">03</span>
+          <h2 class="mt-2 font-bold">slice it in the playground</h2>
+          <p class="mt-2 text-sm">
             drop the image into the <a href="/playground" class="prose-link"
               >playground</a
-            >, set <code class="font-mono text-cream">cellSize</code> to 32, assign
-            the states, press chase me.
+            >, set <code class="font-mono">cellSize</code> to 32, assign the states,
+            press chase me.
           </p>
         </li>
       </ol>
-    </section>
-
-    <div class="dither"></div>
+    </Window>
 
     <!-- caveats -->
-    <section class="py-16">
-      <p class="kicker">the honest part</p>
-      <h2 class="mt-2 text-3xl font-semibold">what goes wrong</h2>
-      <div class="pixel-card mt-8 max-w-3xl p-5">
-        <ul class="space-y-4 text-faded">
-          <li class="flex gap-3">
-            <span class="font-pixel text-xs text-amber">+</span>
-            <span>
-              models rarely land a perfect grid. when the character drifts a few
-              pixels between cells, don't re-roll forever — nudge <code
-                class="font-mono text-cream">cellSize</code
-              > and your cell picks in the playground until the loop steadies.
-            </span>
-          </li>
-          <li class="flex gap-3">
-            <span class="font-pixel text-xs text-amber">+</span>
-            <span>
-              if your model can't do transparency, ask for a solid magenta
-              background instead and key it out in an editor before importing.
-              the playground slices; it doesn't remove backgrounds.
-            </span>
-          </li>
-          <li class="flex gap-3">
-            <span class="font-pixel text-xs text-amber">+</span>
-            <span>
-              when one row comes back broken, regenerate that row as its own
-              request. fighting all twelve cells at once is how an evening
-              disappears.
-            </span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <div class="dither"></div>
+    <Window title="what goes wrong" class="max-w-3xl">
+      <p class="label">the honest part</p>
+      <ul class="mt-4 space-y-4">
+        <li class="flex gap-3">
+          <span class="label mt-1">■</span>
+          <span>
+            models rarely land a perfect grid. when the character drifts a few
+            pixels between cells, don't re-roll forever — nudge <code
+              class="font-mono">cellSize</code
+            > and your cell picks in the playground until the loop steadies.
+          </span>
+        </li>
+        <li class="flex gap-3">
+          <span class="label mt-1">■</span>
+          <span>
+            if your model can't do transparency, ask for a solid magenta
+            background instead and key it out in an editor before importing. the
+            playground slices; it doesn't remove backgrounds.
+          </span>
+        </li>
+        <li class="flex gap-3">
+          <span class="label mt-1">■</span>
+          <span>
+            when one row comes back broken, regenerate that row as its own
+            request. fighting all twelve cells at once is how an evening
+            disappears.
+          </span>
+        </li>
+      </ul>
+    </Window>
 
     <!-- closer -->
-    <section class="py-14">
-      <p class="mx-auto max-w-2xl text-center text-faded">
-        the slime preset took <span class="text-cream">three states</span> and
-        <span class="text-cream">eleven cells</span> — your companion doesn't need
+    <Window title="for scale" class="max-w-2xl">
+      <p>
+        the slime preset took <strong class="font-bold">three states</strong> and
+        <strong class="font-bold">eleven cells</strong> — your companion doesn't need
         much.
       </p>
-    </section>
+    </Window>
   </main>
 </Layout>
