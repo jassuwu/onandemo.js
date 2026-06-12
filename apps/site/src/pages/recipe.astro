@@ -6,14 +6,19 @@ const placeholder = "[describe your character here]";
 
 const recipe = `a pixel-art sprite sheet of a single character, retro desktop-pet style: ${placeholder}
 
-layout: one image, an exact grid of 4 columns by 3 rows of 32x32 pixel cells. 128x96 pixels total, or an exact integer multiple of that (256x192, 512x384).
+layout: one image, an exact grid of 8 columns by 4 rows of 32x32 pixel cells. 256x128 pixels total, or an exact integer multiple of that (512x256, 1024x512). do not make a 4x3 sheet. do not omit cells.
 
-row 1, left to right: idle pose; the same idle pose with one subtle change (a blink, a breath); an alert, startled pose; and a fourth cell left completely empty.
-row 2: a walk cycle facing right, 4 frames, left to right.
-row 3: a sleeping loop, 4 frames, left to right.
+fill all 32 cells exactly like this Neko-compatible slot map. coordinates are [column,row], starting at [0,0] in the top-left. state names in parentheses are for the frame map only; do not draw text labels.
+row 0: [0,0] north-edge antic frame 1 (scratchWallN); [1,0] NW run frame 1; [2,0] rest/sleep frame 1 (sleeping); [3,0] E run frame 1; [4,0] west-edge antic frame 1 (scratchWallW); [5,0] self-antic frame 1 (scratchSelf); [6,0] self-antic frame 2 (scratchSelf); [7,0] self-antic frame 3 (scratchSelf).
+row 1: [0,1] north-edge antic frame 2 (scratchWallN); [1,1] NW run frame 2; [2,1] rest/sleep frame 2 (sleeping); [3,1] E run frame 2; [4,1] west-edge antic frame 2 (scratchWallW); [5,1] SE run frame 1; [6,1] SW run frame 2; [7,1] south-edge antic frame 1 (scratchWallS).
+row 2: [0,2] NE run frame 1; [1,2] N run frame 1; [2,2] east-edge antic frame 1 (scratchWallE); [3,2] tired pose; [4,2] W run frame 1; [5,2] SE run frame 2; [6,2] south-edge antic frame 2 (scratchWallS); [7,2] S run frame 2.
+row 3: [0,3] NE run frame 2; [1,3] N run frame 2; [2,3] east-edge antic frame 2 (scratchWallE); [3,3] idle pose; [4,3] W run frame 2; [5,3] SW run frame 1; [6,3] S run frame 1; [7,3] alert pose.
+
+direction cells are two-frame run loops. the character must face the compass direction named by the cell: N up/back, E right, S down/front, W left, and diagonals between them.
+edge antic cells are character-specific interactions with that side of the cell: touch, tap, knock, inspect, lean, bump, scan, cast, press, or scratch only if scratching fits the character. self-antic is a three-frame character-specific fidget, grooming, tune-up, flourish, or idle trick. rest/sleep is a two-frame rest loop. tired is a single drowsy or worn-out pose. idle is calm. alert is startled.
 
 the character is the same size in every cell and stands on the same ground line in every cell. nothing touches or crosses a cell border.
-transparent background: a png with alpha. no backdrop, no floor, no border around the image.
+transparent background: a png with alpha. no backdrop, no floor, no visible grid, no labels, no border around the image.
 crisp 1px pixel art. hard edges, no anti-aliasing, no soft shadows, no glow, no outlines bleeding between cells.`;
 
 const [recipeBefore, recipeAfter] = recipe.split(placeholder);
@@ -45,15 +50,20 @@ const [recipeBefore, recipeAfter] = recipe.split(placeholder);
         point — they're what makes the result sliceable.
       </p>
       <div class="mt-5 flex items-baseline justify-between gap-3">
-        <span class="label">recipe v1 — 4 cols × 3 rows, 32px cells</span>
+        <span class="label">recipe v1 — 8 cols × 4 rows, 32px cells</span>
         <button class="btn" data-copy={recipe}>copy</button>
       </div>
       <pre
         class="border-ink mt-3 border-2 p-3 font-mono text-sm leading-relaxed whitespace-pre-wrap"><code>{recipeBefore}<span class="bg-amber">{placeholder}</span>{recipeAfter}</code></pre>
       <p class="mt-3 max-w-2xl text-sm">
-        what the rows become: row 1 is <code class="font-mono">idle</code> and
-        <code class="font-mono">alert</code>, row 2 is the run facing east —
-        missing directions mirror from there — and row 3 is a sleeping antic.
+        what the cells become: the exact <code class="font-mono">neko</code> frame
+        map, with the cat-specific antics translated into character-specific edge
+        and self actions, plus eight direction loops, <code class="font-mono"
+          >idle</code
+        >,
+        <code class="font-mono">alert</code>, <code class="font-mono"
+          >sleeping</code
+        >, and <code class="font-mono">tired</code>.
       </p>
     </Window>
 
@@ -114,8 +124,7 @@ const [recipeBefore, recipeAfter] = recipe.split(placeholder);
           <span class="label mt-1">■</span>
           <span>
             when one row comes back broken, regenerate that row as its own
-            request. fighting all twelve cells at once is how an evening
-            disappears.
+            request. fighting all 32 cells at once is how an evening disappears.
           </span>
         </li>
       </ul>
