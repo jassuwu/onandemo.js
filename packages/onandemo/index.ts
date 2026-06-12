@@ -2,6 +2,7 @@
 
 import { mount } from "./src/dom.ts";
 import { resolveFrameMap, type FrameMap } from "./src/frame-map.ts";
+import { neko } from "./src/presets/neko.ts";
 
 export type { Direction } from "./src/direction.ts";
 export type { Cell, FrameMap, ResolvedFrameMap } from "./src/frame-map.ts";
@@ -26,25 +27,39 @@ export interface OnandemoOptions {
   persist?: boolean;
 }
 
+const PRESETS: Record<string, { sheet: string; frameMap: FrameMap }> = {
+  neko,
+};
+
 /** mounts a companion that chases the cursor; returns its destroy function. */
 export function onandemo(options: OnandemoOptions = {}): () => void {
-  if (!options.sheet || !options.frameMap) {
-    throw new Error(
-      "onandemo: presets land soon — until then pass `sheet` and `frameMap`",
-    );
+  if ((options.sheet === undefined) !== (options.frameMap === undefined)) {
+    throw new Error("onandemo: `sheet` and `frameMap` come together");
+  }
+  let sheet = options.sheet;
+  let frameMap = options.frameMap;
+  if (!sheet || !frameMap) {
+    const preset = PRESETS[options.preset ?? "neko"];
+    if (!preset) {
+      throw new Error(
+        `onandemo: unknown preset \`${options.preset}\` — v1 bundles \`neko\``,
+      );
+    }
+    sheet = preset.sheet;
+    frameMap = preset.frameMap;
   }
   if (options.zIndex !== undefined && !Number.isFinite(options.zIndex)) {
     throw new Error("onandemo: zIndex must be a finite number");
   }
   // user knobs ride into the frame map so resolveFrameMap validates everything once
   const map = resolveFrameMap({
-    ...options.frameMap,
-    speed: options.speed ?? options.frameMap.speed,
-    restRadius: options.restRadius ?? options.frameMap.restRadius,
-    scale: options.scale ?? options.frameMap.scale,
+    ...frameMap,
+    speed: options.speed ?? frameMap.speed,
+    restRadius: options.restRadius ?? frameMap.restRadius,
+    scale: options.scale ?? frameMap.scale,
   });
   return mount({
-    sheet: options.sheet,
+    sheet,
     map,
     zIndex: options.zIndex ?? 2147483647,
     persist: options.persist ?? true,

@@ -28,21 +28,24 @@ async function init(): Promise<void> {
   if (zIndex !== undefined) options.zIndex = zIndex;
   if (d["persist"] !== undefined) options.persist = d["persist"] !== "false";
 
-  if (d["sheet"] === undefined || d["frameMap"] === undefined) {
-    console.warn(
-      "onandemo: the neko preset lands soon — set data-sheet and data-frame-map until then",
-    );
-    return;
+  if (d["sheet"] !== undefined || d["frameMap"] !== undefined) {
+    if (d["sheet"] === undefined || d["frameMap"] === undefined) {
+      console.warn("onandemo: data-sheet and data-frame-map come together");
+      return;
+    }
+    // bring-your-own paths resolve against the page, like any asset it names
+    options.sheet = new URL(d["sheet"], document.baseURI).href;
+    const res = await fetch(new URL(d["frameMap"], document.baseURI));
+    if (!res.ok) {
+      throw new Error(
+        `onandemo: could not fetch frame map ${d["frameMap"]} (${res.status})`,
+      );
+    }
+    options.frameMap = (await res.json()) as FrameMap;
+  } else if (d["preset"] !== undefined) {
+    options.preset = d["preset"];
   }
-  // bring-your-own paths resolve against the page, like any asset it names
-  options.sheet = new URL(d["sheet"], document.baseURI).href;
-  const res = await fetch(new URL(d["frameMap"], document.baseURI));
-  if (!res.ok) {
-    throw new Error(
-      `onandemo: could not fetch frame map ${d["frameMap"]} (${res.status})`,
-    );
-  }
-  options.frameMap = (await res.json()) as FrameMap;
+  // no attributes at all: the neko homage, zero config
   onandemo(options);
 }
 

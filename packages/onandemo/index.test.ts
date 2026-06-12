@@ -12,8 +12,20 @@ mock.module("./src/dom.ts", () => ({
 const { onandemo } = await import("./index.ts");
 
 describe("the factory", () => {
-  test("throws without sheet + frameMap", () => {
-    expect(() => onandemo({})).toThrow("sheet");
+  test("zero config mounts the neko homage", () => {
+    onandemo();
+    const o = captured.at(-1)!;
+    expect(o.sheet.startsWith("data:image/gif;base64,")).toBe(true);
+    expect(o.map.cellW).toBe(32);
+    expect(o.map.antics.length).toBe(7);
+  });
+
+  test("unknown preset throws", () => {
+    expect(() => onandemo({ preset: "doge" })).toThrow("unknown preset");
+  });
+
+  test("sheet without frameMap throws — they come together", () => {
+    expect(() => onandemo({ sheet: "s.png" })).toThrow("together");
   });
 
   test("knob precedence: user option > frame map > default, zeros included", () => {
