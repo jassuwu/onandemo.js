@@ -1,0 +1,21 @@
+{
+  "name": "remotion",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "studio": "remotion studio",
+    "render:hero": "remotion render hero out/hero.mp4",
+    "render:social": "remotion render social out/social.mp4",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "remotion": "^4.0.475",
+    "@remotion/cli": "^4.0.475",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^6.0.3"
+  }
+}
