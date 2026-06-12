@@ -11,6 +11,7 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
+    "publish": "turbo typecheck build --filter=onandemo && cd packages/onandemo && bun publish",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check ."
   },
