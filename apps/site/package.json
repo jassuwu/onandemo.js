@@ -4,14 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "sync": "mkdir -p public/presets && cp ../../packages/onandemo/presets/* public/presets/ && cp ../../packages/onandemo/src/presets/neko.gif public/presets/neko.gif",
+    "dev": "bun run sync && astro dev",
+    "build": "bun run sync && astro build",
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^6.4.6",
-    "tailwindcss": "^4.3.0",
+    "@fontsource-variable/bricolage-grotesque": "^5.2.10",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@fontsource/silkscreen": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
-    "onandemo": "workspace:*"
+    "astro": "^6.4.6",
+    "onandemo": "workspace:*",
+    "tailwindcss": "^4.3.0"
   }
 }

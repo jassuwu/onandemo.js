@@ -1,0 +1,135 @@
+---
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/jetbrains-mono";
+import "@fontsource/silkscreen";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "onandemo.js — oneko.js, but anything chases your cursor",
+  description = "a cursor-companion engine: bundled pixel characters or your own sprite sheet, chasing the mouse with oneko's manners.",
+} = Astro.props;
+
+const path = Astro.url.pathname;
+const nav = [
+  { href: "/playground", label: "playground" },
+  { href: "/recipe", label: "recipe" },
+  { href: "https://github.com/jassuwu/onandemo.js", label: "github" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" type="image/gif" href="/presets/neko.gif" />
+  </head>
+  <body class="bg-ink text-cream font-body min-h-dvh antialiased">
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <header
+      class="mx-auto flex max-w-5xl items-baseline justify-between px-6 py-5"
+    >
+      <a href="/" class="font-semibold tracking-tight hover:text-amber"
+        >onandemo.js</a
+      >
+      <nav class="flex gap-5 text-sm">
+        {
+          nav.map((item) => (
+            <a
+              href={item.href}
+              class:list={[
+                "hover:text-amber",
+                path.startsWith(item.href)
+                  ? "text-amber underline decoration-dotted underline-offset-4"
+                  : "text-faded",
+              ]}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer class="mt-24">
+      <div class="dither"></div>
+      <div
+        class="mx-auto flex max-w-5xl flex-wrap items-baseline justify-between gap-4 px-6 py-8 text-sm text-faded"
+      >
+        <span class="font-pixel text-xs"
+          >px chased: <span id="odometer" class="text-amber">000000</span></span
+        >
+        <span>
+          <a
+            href="https://github.com/jassuwu/onandemo.js/blob/main/LICENSE"
+            class="prose-link">MIT</a
+          >
+          ·
+          <a
+            href="https://github.com/jassuwu/onandemo.js/blob/main/packages/onandemo/NOTICE.md"
+            class="prose-link">sprite receipts</a
+          >
+          · a love letter to
+          <a href="https://github.com/adryd325/oneko.js" class="prose-link"
+            >oneko.js</a
+          >
+        </span>
+      </div>
+    </footer>
+
+    <script>
+      import { preview, summon, who } from "../lib/companion.ts";
+
+      window.companion = { summon, preview, who };
+      void summon("neko");
+
+      // the one easter egg: how far has it run for you
+      const odometer = document.getElementById("odometer");
+      let last: [number, number] | null = null;
+      let chased = 0;
+      setInterval(() => {
+        const el = document.getElementById("onandemo");
+        if (!el) {
+          last = null;
+          return;
+        }
+        const x = parseFloat(el.style.left);
+        const y = parseFloat(el.style.top);
+        if (last) chased += Math.hypot(x - last[0], y - last[1]);
+        last = [x, y];
+        if (odometer) {
+          odometer.textContent = String(Math.round(chased)).padStart(6, "0");
+        }
+      }, 400);
+
+      // copy buttons, sitewide: any element with data-copy
+      document.addEventListener("click", (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLElement>(
+          "[data-copy]",
+        );
+        if (!btn) return;
+        const text = btn.dataset["copy"];
+        if (!text) return;
+        void navigator.clipboard.writeText(text).then(() => {
+          const was = btn.textContent;
+          btn.textContent = "copied";
+          setTimeout(() => {
+            btn.textContent = was;
+          }, 900);
+        });
+      });
+    </script>
+  </body>
+</html>

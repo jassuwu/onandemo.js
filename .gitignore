@@ -1,6 +1,7 @@
 node_modules/
 dist/
 packages/onandemo/README.md
+apps/site/public/presets/
 out/
 .turbo/
 .astro/
