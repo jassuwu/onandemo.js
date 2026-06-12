@@ -20,8 +20,9 @@ The `neko` preset is base64-inlined into every build — one script tag, zero ex
 requests, no path assumptions. Every other preset ships as files inside the npm
 package: npm users `import ninja from 'onandemo/presets/ninja'` (subpath exports,
 pay-per-import); script-tag users write `data-preset="ninja"` and the library resolves
-`./presets/ninja.json` **relative to `document.currentScript.src`** — unpkg serves the
-files from the same package, self-hosting works unchanged.
+`../presets/ninja.json` **relative to `document.currentScript.src`** (the script lives
+in `dist/`, presets beside it) — unpkg serves the files from the same package,
+self-hosting works unchanged.
 
 ## Consequences
 

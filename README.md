@@ -17,6 +17,9 @@ one tag, zero config — the classic cat:
 <script src="https://unpkg.com/onandemo/dist/onandemo.js"></script>
 ```
 
+swap the companion with `data-preset="soldier"` or `data-preset="slime"` — the
+preset files ship inside the package and resolve from the script's own URL.
+
 or bring a sheet (a grid of cells) and a frame map (which cells mean what):
 
 ```html
@@ -104,7 +107,7 @@ dependencies, zero extra requests.
 
 ## roadmap
 
-- more bundled presets — CC0 friends for the cat, receipts continuing in [NOTICE.md](packages/onandemo/NOTICE.md).
+- more presets — shepardskin's CC0 cat (needs a repack), ninja adventure friends; receipts continue in [NOTICE.md](packages/onandemo/NOTICE.md).
 - [onandemo.jass.gg](https://onandemo.jass.gg) — live demo, a playground that slices any image into a sheet + frame map, and the recipe: a prompt you paste into your own image model to get a compliant sheet back.
 - npm `0.1.0` — the engine above is built and tested; the publish is imminent.
 - a demo gif right here.
