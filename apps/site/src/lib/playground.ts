@@ -1,10 +1,12 @@
 /**
  * the playground: slice a dropped image into a sheet of cells, deal cells to
- * states, and hand the finished frame map to the live companion.
+ * states, hand the finished frame map to the live companion, and mint the
+ * whole creature into a /c link (ADR-0011).
  * pure helpers up top; initPlayground() wires the page.
  */
 
 import type { Cell, FrameMap } from "onandemo";
+import { mint } from "./mint.ts";
 
 /** the eight run directions, in chip order. */
 const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
@@ -15,6 +17,9 @@ const RESERVED = new Set<string>(["idle", "alert", ...DIRECTIONS]);
 const ANTIC_NAME = /^[a-z][a-z0-9-]*$/;
 const ACCEPT = new Set(["image/png", "image/gif", "image/webp"]);
 const MIN_CELL = 4;
+
+/** past this many chars, chat apps start eating links (ADR-0011). */
+const LONG_LINK = 8000;
 
 interface Model {
   file: File | null;
@@ -117,24 +122,27 @@ export function initPlayground(): void {
   const marks = el("pg-marks", HTMLDivElement);
   const cursor = el("pg-cursor", HTMLDivElement);
   const readout = el("pg-readout", HTMLSpanElement);
-  // 2 · cell size
+  // 2 · the cells
   const cellWInput = el("pg-cell-w", HTMLInputElement);
   const cellHInput = el("pg-cell-h", HTMLInputElement);
   const suggest = el("pg-suggest", HTMLDivElement);
   const auto = el("pg-auto", HTMLButtonElement);
-  // 3 · states
+  // 3 · the states
   const chipBox = el("pg-states", HTMLDivElement);
   const anticName = el("pg-antic-name", HTMLInputElement);
   const anticAdd = el("pg-antic-add", HTMLButtonElement);
   const anticErr = el("pg-antic-err", HTMLParagraphElement);
-  // 4-6 · scale, validity, chase
+  // 4 · the chase
   const scaleGroup = el("pg-scale", HTMLDivElement);
   const validity = el("pg-valid", HTMLParagraphElement);
   const chase = el("pg-chase", HTMLButtonElement);
-  // 7 · export
-  const jsonCode = el("pg-json", HTMLElement);
-  const exportName = el("pg-export-name", HTMLSpanElement);
-  const copyBtn = el("pg-copy", HTMLButtonElement);
+  // 5 · the mint, plus the quiet json secondary
+  const mintBtn = el("pg-mint", HTMLButtonElement);
+  const mintOut = el("pg-mint-out", HTMLDivElement);
+  const linkEl = el("pg-link", HTMLAnchorElement);
+  const linkCopy = el("pg-link-copy", HTMLButtonElement);
+  const sizeEl = el("pg-size", HTMLSpanElement);
+  const sizeWarn = el("pg-size-warn", HTMLParagraphElement);
   const downloadBtn = el("pg-download", HTMLButtonElement);
   const serve = el("pg-serve", HTMLParagraphElement);
 
@@ -163,6 +171,13 @@ export function initPlayground(): void {
   const ch = (): number => model.cellH * model.zoom;
   const base = (): string =>
     model.file ? model.file.name.replace(/\.[^.]+$/, "") : "sheet";
+  const buildMap = (): FrameMap =>
+    buildFrameMap(model.cellW, model.cellH, model.scale, model.states);
+
+  /** what the last mint was minted from — a new sheet or map goes stale. */
+  const signature = (): string =>
+    `${model.url ?? ""}|${JSON.stringify(buildMap())}`;
+  let mintedFor: string | null = null;
 
   /** cells that fell off the grid after a resize don't linger in any state. */
   function prune(): void {
@@ -198,8 +213,8 @@ export function initPlayground(): void {
     overlay.style.width = `${cols() * cw()}px`;
     overlay.style.height = `${rows() * ch()}px`;
     overlay.style.backgroundImage =
-      "linear-gradient(to right, var(--color-line) 1px, transparent 1px), " +
-      "linear-gradient(to bottom, var(--color-line) 1px, transparent 1px)";
+      "linear-gradient(to right, rgb(0 0 0 / 0.25) 1px, transparent 1px), " +
+      "linear-gradient(to bottom, rgb(0 0 0 / 0.25) 1px, transparent 1px)";
     overlay.style.backgroundSize = `${cw()}px ${ch()}px`;
     sheetName.textContent = model.file?.name ?? "";
     sheetDims.textContent = `${model.imgW}×${model.imgH}px · ${cols()}×${rows()} cells`;
@@ -228,7 +243,7 @@ export function initPlayground(): void {
     };
     const active = model.states.get(model.active) ?? [];
     const activeKeys = new Set(active.map(([c, r]) => `${c},${r}`));
-    // cells already dealt to other states: a faint claim
+    // cells already dealt to other states: a faint ink claim
     const seen = new Set<string>();
     for (const [name, cells] of model.states) {
       if (name === model.active) continue;
@@ -238,18 +253,18 @@ export function initPlayground(): void {
         seen.add(key);
         const m = document.createElement("div");
         m.className = "absolute";
-        m.style.boxShadow = "inset 0 0 0 1px rgb(179 163 132 / 0.5)";
-        m.style.background = "rgb(179 163 132 / 0.08)";
+        m.style.boxShadow = "inset 0 0 0 1px rgb(0 0 0 / 0.45)";
+        m.style.background = "rgb(0 0 0 / 0.08)";
         place(m, c, r);
         marks.appendChild(m);
       }
     }
-    // the active state's cells, numbered in deal order
+    // the active state's cells, numbered in deal order — an amber claim
     active.forEach(([c, r], i) => {
       const m = document.createElement("div");
       m.className = "absolute";
       m.style.boxShadow = "inset 0 0 0 2px var(--color-amber)";
-      m.style.background = "rgb(255 179 71 / 0.16)";
+      m.style.background = "rgb(245 158 11 / 0.18)";
       place(m, c, r);
       const badge = document.createElement("span");
       badge.className =
@@ -270,18 +285,14 @@ export function initPlayground(): void {
       const pick = document.createElement("button");
       pick.type = "button";
       pick.className = isActive
-        ? "cursor-pointer border-2 border-amber bg-amber/10 px-2 py-1.5 font-pixel text-[11px] leading-none text-amber"
-        : "cursor-pointer border-2 border-line bg-soot px-2 py-1.5 font-pixel text-[11px] leading-none text-faded hover:border-faded hover:text-cream";
+        ? "border-ink bg-amber text-ink cursor-pointer border-2 px-2 py-1.5 font-pixel text-[11px] leading-none"
+        : "border-ink bg-paper text-ink hover:bg-ink hover:text-paper cursor-pointer border-2 px-2 py-1.5 font-pixel text-[11px] leading-none";
       pick.setAttribute("aria-pressed", String(isActive));
       const label = document.createElement("span");
       label.textContent = name;
       const count = document.createElement("span");
       count.className =
-        cells.length === 0
-          ? "ml-1.5 opacity-50"
-          : isActive
-            ? "ml-1.5 text-cream"
-            : "ml-1.5 text-amber";
+        cells.length === 0 ? "ml-1.5 opacity-50" : "ml-1.5 font-bold";
       count.textContent = String(cells.length);
       pick.append(label, count);
       pick.addEventListener("click", () => {
@@ -292,7 +303,7 @@ export function initPlayground(): void {
       const clearBtn = document.createElement("button");
       clearBtn.type = "button";
       clearBtn.className =
-        "cursor-pointer border-2 border-l-0 border-line bg-soot px-1.5 font-pixel text-[11px] leading-none text-faded hover:border-ember hover:text-ember";
+        "border-ink bg-paper hover:bg-ink hover:text-paper cursor-pointer border-2 border-l-0 px-1.5 font-pixel text-[11px] leading-none";
       clearBtn.textContent = "×";
       const verb = isAntic ? "remove" : "clear";
       clearBtn.title = `${verb} ${name}`;
@@ -315,14 +326,14 @@ export function initPlayground(): void {
     const miss = missingStates(model.states);
     const legal = miss.length === 0;
     if (model.url === null) {
-      validity.className = "font-pixel text-xs text-faded";
+      validity.className = "label opacity-60";
       validity.textContent =
         "waiting on a sheet — idle plus one run direction makes a companion (ADR-0007).";
     } else if (!legal) {
-      validity.className = "font-pixel text-xs text-ember";
+      validity.className = "label";
       validity.textContent = `not legal yet — missing ${miss.join(" and ")} (ADR-0007).`;
     } else {
-      validity.className = "font-pixel text-xs text-amber";
+      validity.className = "label";
       validity.textContent =
         "legal — idle plus a run direction. missing directions resolve down the ladder.";
     }
@@ -330,26 +341,18 @@ export function initPlayground(): void {
   }
 
   function renderExport(): void {
-    const map = buildFrameMap(
-      model.cellW,
-      model.cellH,
-      model.scale,
-      model.states,
-    );
-    const json = formatExport(model.file?.name ?? "your-sheet.png", map);
-    jsonCode.textContent = json;
-    exportName.textContent = `${base()}.json`;
     const ready = model.file !== null;
-    copyBtn.disabled = !ready;
+    const legal = missingStates(model.states).length === 0;
+    mintBtn.disabled = !(ready && legal);
     downloadBtn.disabled = !ready;
-    if (ready) {
-      copyBtn.dataset["copy"] = json;
-    } else {
-      delete copyBtn.dataset["copy"];
-    }
     serve.textContent = model.file
       ? `serve ${base()}.json next to ${model.file.name} and point data-frame-map at it.`
       : "serve the json next to the image and point data-frame-map at it.";
+    // a minted link goes stale the moment the sheet or the map changes
+    if (mintedFor !== null && mintedFor !== signature()) {
+      mintedFor = null;
+      mintOut.classList.add("hidden");
+    }
   }
 
   function renderAll(): void {
@@ -408,17 +411,17 @@ export function initPlayground(): void {
     filePick.value = "";
   });
 
-  for (const target of [drop, viewer]) {
+  for (const target of [drop, viewer] as HTMLElement[]) {
     target.addEventListener("dragover", (e) => {
       e.preventDefault();
-      target.style.borderColor = "var(--color-amber)";
+      target.style.backgroundColor = "rgb(0 0 0 / 0.08)";
     });
     target.addEventListener("dragleave", () => {
-      target.style.borderColor = "";
+      target.style.backgroundColor = "";
     });
     target.addEventListener("drop", (e) => {
       e.preventDefault();
-      target.style.borderColor = "";
+      target.style.backgroundColor = "";
       const f = e.dataTransfer?.files[0];
       if (f) loadFile(f);
     });
@@ -484,7 +487,7 @@ export function initPlayground(): void {
     readout.textContent = "hover a cell";
   });
 
-  // -- cell size ------------------------------------------------------------
+  // -- the cells ------------------------------------------------------------
 
   function commitCell(input: HTMLInputElement, axis: "w" | "h"): void {
     const v = Math.floor(Number(input.value));
@@ -525,7 +528,7 @@ export function initPlayground(): void {
     renderAll();
   });
 
-  // -- states ---------------------------------------------------------------
+  // -- the states -----------------------------------------------------------
 
   function addAntic(): void {
     const raw = anticName.value.trim();
@@ -564,7 +567,7 @@ export function initPlayground(): void {
     anticErr.textContent = "";
   });
 
-  // -- scale + chase ---------------------------------------------------------
+  // -- the chase ------------------------------------------------------------
 
   scaleGroup.addEventListener("click", (e) => {
     const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-scale]");
@@ -578,13 +581,7 @@ export function initPlayground(): void {
 
   chase.addEventListener("click", () => {
     if (model.url === null) return;
-    const map = buildFrameMap(
-      model.cellW,
-      model.cellH,
-      model.scale,
-      model.states,
-    );
-    window.companion.preview(model.url, map, model.scale);
+    window.companion.preview(model.url, buildMap(), model.scale);
     const was = chase.textContent;
     chase.textContent = "it's loose";
     setTimeout(() => {
@@ -592,17 +589,41 @@ export function initPlayground(): void {
     }, 900);
   });
 
-  // -- export ----------------------------------------------------------------
+  // -- the mint (ADR-0011) ----------------------------------------------------
+
+  mintBtn.addEventListener("click", () => {
+    const file = model.file;
+    if (file === null) return;
+    const frameMap = buildMap();
+    const stamp = signature();
+    const reader = new FileReader();
+    reader.onload = () => {
+      const sheet = reader.result;
+      if (typeof sheet !== "string") return;
+      const link = `${location.origin}/c#${mint({ v: 1, sheet, frameMap })}`;
+      linkEl.href = link;
+      linkEl.textContent = link.length > 72 ? `${link.slice(0, 64)}…` : link;
+      linkCopy.dataset["copy"] = link;
+      sizeEl.textContent = `${link.length.toLocaleString()} chars`;
+      sizeWarn.classList.toggle("hidden", link.length <= LONG_LINK);
+      mintedFor = stamp;
+      mintOut.classList.remove("hidden");
+    };
+    reader.onerror = () => {
+      const was = mintBtn.textContent;
+      mintBtn.textContent = "couldn't read the sheet";
+      setTimeout(() => {
+        mintBtn.textContent = was;
+      }, 1200);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // -- the json secondary -----------------------------------------------------
 
   downloadBtn.addEventListener("click", () => {
     if (model.file === null) return;
-    const map = buildFrameMap(
-      model.cellW,
-      model.cellH,
-      model.scale,
-      model.states,
-    );
-    const json = formatExport(model.file.name, map);
+    const json = formatExport(model.file.name, buildMap());
     const blobUrl = URL.createObjectURL(
       new Blob([`${json}\n`], { type: "application/json" }),
     );

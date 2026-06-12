@@ -1,39 +1,37 @@
 ---
+import Window from "../components/Window.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout
-  title="playground — onandemo.js"
-  description="turn any image into a sheet and a frame map in the browser, then make it chase your cursor for real."
+  title="onandemo.js — the playground"
+  description="turn any image into a sheet and a frame map in your tab, set it chasing for real, then mint it into a companion link. nothing uploads."
 >
-  <main class="mx-auto max-w-5xl px-6">
+  <main class="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
     <!-- intro -->
-    <section class="pt-16 pb-12">
-      <p class="kicker">the playground</p>
-      <h1
-        class="mt-3 text-4xl font-bold tracking-tight text-balance sm:text-5xl"
-      >
+    <Window title="the playground" class="max-w-3xl">
+      <h1 class="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
         slice anything. set it loose.
       </h1>
-      <p class="mt-4 max-w-2xl text-faded">
+      <p class="mt-4">
         drop an image, slice it into cells, deal the cells to states. the moment
-        the frame map is legal, your creation chases your cursor — on this page,
-        for real. nothing uploads; the whole bench runs in your tab.
+        the frame map is legal, your companion chases your cursor — on this
+        page, for real — and mints into a link you can send anywhere. nothing
+        uploads; the whole bench runs in your tab.
+      </p>
+      <p class="mt-3 text-sm">
+        no art yet? <a href="/recipe" class="prose-link">the recipe</a> prompts your
+        image model.
       </p>
       <noscript>
-        <p class="mt-4 font-pixel text-xs text-ember">
+        <p class="label mt-4">
           the playground slices in your tab — it needs javascript.
         </p>
       </noscript>
-    </section>
+    </Window>
 
-    <div class="dither"></div>
-
-    <!-- 1 · the sheet -->
-    <section class="py-12">
-      <p class="kicker">step 1 — the sheet</p>
-      <h2 class="mt-2 text-3xl font-semibold">drop an image</h2>
-
+    <!-- the sheet -->
+    <Window title="the sheet">
       <input
         id="pg-file"
         type="file"
@@ -44,25 +42,20 @@ import Layout from "../layouts/Layout.astro";
       <button
         id="pg-drop"
         type="button"
-        class="mt-8 block w-full cursor-pointer border-2 border-dashed border-line bg-soot/50 px-6 py-16 text-center transition-colors hover:border-amber"
+        class="border-ink hover:bg-ink/5 block w-full cursor-pointer border-2 border-dashed px-6 py-16 text-center"
       >
-        <span class="font-pixel text-sm text-cream">drop a sheet here</span>
-        <span class="mt-2 block text-sm text-faded"
-          >or click to pick a file</span
-        >
-        <span
-          id="pg-drop-hint"
-          class="mt-4 block font-pixel text-xs text-faded"
-        >
+        <span class="label">drop a sheet here</span>
+        <span class="mt-2 block text-sm">or click to pick a file</span>
+        <span id="pg-drop-hint" class="label mt-4 block opacity-60">
           png / gif / webp · a uniform grid of cells works best
         </span>
       </button>
 
-      <div id="pg-viewer" class="pixel-card mt-8 hidden p-5">
+      <div id="pg-viewer" class="hidden">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <span class="min-w-0 font-pixel text-xs">
-            <span id="pg-name" class="text-amber"></span>
-            <span id="pg-dims" class="ml-2 text-faded"></span>
+          <span class="label min-w-0">
+            <span id="pg-name"></span>
+            <span id="pg-dims" class="ml-2 opacity-60"></span>
           </span>
           <span class="flex flex-wrap items-center gap-3">
             <span
@@ -72,35 +65,35 @@ import Layout from "../layouts/Layout.astro";
               aria-label="zoom"
             >
               <button
-                class="pixel-btn"
+                class="btn"
                 type="button"
                 data-zoom="1"
                 aria-pressed="false">1x</button
               >
               <button
-                class="pixel-btn"
+                class="btn"
                 type="button"
                 data-zoom="2"
                 aria-pressed="true">2x</button
               >
               <button
-                class="pixel-btn"
+                class="btn"
                 type="button"
                 data-zoom="3"
                 aria-pressed="false">3x</button
               >
               <button
-                class="pixel-btn"
+                class="btn"
                 type="button"
                 data-zoom="4"
                 aria-pressed="false">4x</button
               >
             </span>
-            <button id="pg-swap" class="pixel-btn" type="button">swap</button>
+            <button id="pg-swap" class="btn" type="button">swap</button>
           </span>
         </div>
         <div class="mt-4 max-h-[70vh] overflow-auto pb-2">
-          <div id="pg-frame" class="relative border-2 border-line select-none">
+          <div id="pg-frame" class="border-ink relative border-2 select-none">
             <img
               id="pg-img"
               alt="your dropped sheet, pixel-crisp"
@@ -114,184 +107,173 @@ import Layout from "../layouts/Layout.astro";
               <div
                 id="pg-cursor"
                 class="pointer-events-none absolute hidden"
-                style="box-shadow: inset 0 0 0 2px rgb(244 233 211 / 0.5);"
+                style="box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.5);"
               >
               </div>
             </div>
           </div>
         </div>
-        <p class="mt-3 h-5 font-pixel text-xs">
-          <span class="text-faded">cell:</span>
-          <span id="pg-readout" class="text-amber">hover a cell</span>
+        <p class="label mt-3 h-5">
+          cell: <span id="pg-readout" class="text-amber-deep">hover a cell</span
+          >
         </p>
       </div>
-    </section>
+    </Window>
 
-    <div class="dither"></div>
-
-    <!-- 2-6 · the map -->
-    <section class="py-12">
-      <p class="kicker">step 2 — the map</p>
-      <h2 class="mt-2 text-3xl font-semibold">slice and deal</h2>
-      <p class="mt-3 max-w-2xl text-faded">
-        pick a cell size, select a state, then click cells on the sheet above in
-        the order they should play. click a numbered cell to take it back.
-      </p>
-
-      <div class="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_1.3fr_1fr]">
-        <!-- 2 · cell size -->
-        <div class="pixel-card p-5">
-          <span class="font-pixel text-xs text-faded">cell size</span>
-          <div class="mt-4 flex items-center gap-2">
-            <label class="flex items-center gap-2 font-mono text-sm text-faded">
-              w
-              <input
-                id="pg-cell-w"
-                type="number"
-                min="4"
-                step="1"
-                value="32"
-                class="w-20 border-2 border-line bg-ink px-2 py-1 font-mono text-sm text-cream"
-              />
-            </label>
-            <span class="font-mono text-sm text-faded">×</span>
-            <label class="flex items-center gap-2 font-mono text-sm text-faded">
-              h
-              <input
-                id="pg-cell-h"
-                type="number"
-                min="4"
-                step="1"
-                value="32"
-                class="w-20 border-2 border-line bg-ink px-2 py-1 font-mono text-sm text-cream"
-              />
-            </label>
-          </div>
-          <div id="pg-suggest" class="mt-4 flex flex-wrap gap-2">
-            <button class="pixel-btn" type="button" data-cell="16">16</button>
-            <button class="pixel-btn" type="button" data-cell="32">32</button>
-            <button class="pixel-btn" type="button" data-cell="48">48</button>
-            <button class="pixel-btn" type="button" data-cell="64">64</button>
-            <button id="pg-auto" class="pixel-btn" type="button" disabled
-              >auto-guess</button
-            >
-          </div>
-          <p class="mt-4 text-sm text-faded">
-            auto-guess reads the image's divisors and aims near 32. the grid
-            redraws as you type.
-          </p>
-        </div>
-
-        <!-- 3 · states -->
-        <div class="pixel-card p-5">
-          <span class="font-pixel text-xs text-faded">states</span>
-          <div id="pg-states" class="mt-4 flex flex-wrap gap-2"></div>
-          <div class="mt-5 flex gap-2">
+    <!-- the map: cells, states, chase -->
+    <div class="grid items-start gap-10 lg:grid-cols-[1fr_1.3fr_1fr]">
+      <Window title="the cells">
+        <div class="flex items-center gap-2">
+          <label class="flex items-center gap-2 font-mono text-sm">
+            w
             <input
-              id="pg-antic-name"
-              type="text"
-              placeholder="antic name — sleep, spin, melt"
-              class="min-w-0 flex-1 border-2 border-line bg-ink px-2 py-1 font-mono text-sm text-cream placeholder:text-faded/60"
+              id="pg-cell-w"
+              type="number"
+              min="4"
+              step="1"
+              value="32"
+              class="border-ink bg-paper w-20 border-2 px-2 py-1 font-mono text-sm"
             />
-            <button id="pg-antic-add" class="pixel-btn shrink-0" type="button"
-              >add antic</button
-            >
-          </div>
-          <p
-            id="pg-antic-err"
-            class="mt-2 h-4 font-pixel text-[11px] text-ember"
-          >
-          </p>
-          <p class="mt-2 text-sm text-faded">
-            idle and the directions drive the chase; any other name is an antic
-            — a rare idle performance.
-          </p>
+          </label>
+          <span class="font-mono text-sm">×</span>
+          <label class="flex items-center gap-2 font-mono text-sm">
+            h
+            <input
+              id="pg-cell-h"
+              type="number"
+              min="4"
+              step="1"
+              value="32"
+              class="border-ink bg-paper w-20 border-2 px-2 py-1 font-mono text-sm"
+            />
+          </label>
         </div>
+        <div id="pg-suggest" class="mt-4 flex flex-wrap gap-2">
+          <button class="btn" type="button" data-cell="16">16</button>
+          <button class="btn" type="button" data-cell="32">32</button>
+          <button class="btn" type="button" data-cell="48">48</button>
+          <button class="btn" type="button" data-cell="64">64</button>
+          <button id="pg-auto" class="btn" type="button" disabled
+            >auto-guess</button
+          >
+        </div>
+        <p class="mt-4 text-sm">
+          auto-guess reads the image's divisors and aims near 32. the grid
+          redraws as you type.
+        </p>
+      </Window>
 
-        <!-- 4-6 · scale, validity, chase -->
-        <div class="pixel-card p-5">
-          <span class="font-pixel text-xs text-faded">scale</span>
-          <div
-            id="pg-scale"
-            class="mt-4 flex flex-wrap gap-2"
-            role="group"
-            aria-label="scale"
-          >
-            <button
-              class="pixel-btn"
-              type="button"
-              data-scale="1"
-              aria-pressed="true">1x</button
-            >
-            <button
-              class="pixel-btn"
-              type="button"
-              data-scale="2"
-              aria-pressed="false">2x</button
-            >
-            <button
-              class="pixel-btn"
-              type="button"
-              data-scale="3"
-              aria-pressed="false">3x</button
-            >
-            <button
-              class="pixel-btn"
-              type="button"
-              data-scale="4"
-              aria-pressed="false">4x</button
-            >
-          </div>
-          <p class="mt-3 text-sm text-faded">
-            display multiplier — cells stay crisp at any size.
-          </p>
-          <div class="dither my-5"></div>
-          <p id="pg-valid" class="font-pixel text-xs text-faded">
-            waiting on a sheet — idle plus one run direction makes a companion
-            (ADR-0007).
-          </p>
-          <button
-            id="pg-chase"
-            class="pixel-btn mt-4 w-full text-amber"
-            type="button"
-            disabled>chase me</button
+      <Window title="the states">
+        <p class="text-sm">
+          select a state, then click cells on the sheet above in the order they
+          should play. click a numbered cell to take it back.
+        </p>
+        <div id="pg-states" class="mt-4 flex flex-wrap gap-2"></div>
+        <div class="mt-5 flex gap-2">
+          <input
+            id="pg-antic-name"
+            type="text"
+            placeholder="antic name — sleep, spin, melt"
+            class="border-ink bg-paper placeholder:text-ink/50 min-w-0 flex-1 border-2 px-2 py-1 font-mono text-sm"
+          />
+          <button id="pg-antic-add" class="btn shrink-0" type="button"
+            >add antic</button
           >
         </div>
+        <p id="pg-antic-err" class="label mt-2 h-4"></p>
+        <p class="mt-2 text-sm">
+          idle and the directions drive the chase; any other name is an antic —
+          a rare idle performance.
+        </p>
+      </Window>
+
+      <Window title="the chase">
+        <span class="label">scale</span>
+        <div
+          id="pg-scale"
+          class="mt-3 flex flex-wrap gap-2"
+          role="group"
+          aria-label="scale"
+        >
+          <button class="btn" type="button" data-scale="1" aria-pressed="true"
+            >1x</button
+          >
+          <button class="btn" type="button" data-scale="2" aria-pressed="false"
+            >2x</button
+          >
+          <button class="btn" type="button" data-scale="3" aria-pressed="false"
+            >3x</button
+          >
+          <button class="btn" type="button" data-scale="4" aria-pressed="false"
+            >4x</button
+          >
+        </div>
+        <p class="mt-3 text-sm">
+          display multiplier — cells stay crisp at any size.
+        </p>
+        <div class="border-ink/30 my-5 border-t-2"></div>
+        <p id="pg-valid" class="label opacity-60">
+          waiting on a sheet — idle plus one run direction makes a companion
+          (ADR-0007).
+        </p>
+        <button
+          id="pg-chase"
+          class="btn-amber mt-4 w-full"
+          type="button"
+          disabled>chase me</button
+        >
+      </Window>
+    </div>
+
+    <!-- the mint -->
+    <Window title="the mint">
+      <p class="max-w-2xl">
+        the real export: the sheet and the frame map fold into one link, and
+        whoever opens it gets chased. the link never touches a server — the
+        fragment stays in the tab.
+      </p>
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <button id="pg-mint" class="btn-amber" type="button" disabled
+          >mint a link</button
+        >
+        <span class="label opacity-60"
+          >lights up when the frame map is legal</span
+        >
       </div>
-    </section>
 
-    <div class="dither"></div>
-
-    <!-- 7-8 · export -->
-    <section class="py-12">
-      <p class="kicker">step 3 — ship it</p>
-      <h2 class="mt-2 text-3xl font-semibold">take the map with you</h2>
-      <div class="pixel-card mt-8 p-5">
+      <div id="pg-mint-out" class="border-ink mt-5 hidden border-2 p-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <span class="font-pixel text-xs text-faded"
-            ><span id="pg-export-name">sheet.json</span></span
-          >
-          <span class="flex gap-2">
-            <button id="pg-copy" class="pixel-btn" type="button" disabled
-              >copy</button
-            >
-            <button id="pg-download" class="pixel-btn" type="button" disabled
-              >download</button
-            >
-          </span>
+          <span class="label">your companion, link-shaped</span>
+          <button id="pg-link-copy" class="btn" type="button">copy link</button>
         </div>
-        <pre
-          class="mt-4 overflow-x-auto font-mono text-sm text-faded"><code id="pg-json" /></pre>
-        <p id="pg-serve" class="mt-3 font-pixel text-xs text-faded">
+        <p class="mt-3">
+          <a id="pg-link" href="" class="prose-link font-mono text-sm break-all"
+          ></a>
+        </p>
+        <p class="label mt-3"><span id="pg-size"></span></p>
+        <p id="pg-size-warn" class="mt-2 hidden text-sm">
+          tiny sheets travel best — chat apps truncate long links.
+        </p>
+        <p class="mt-2 text-sm">
+          nothing was uploaded — the creature lives in the link itself.
+        </p>
+      </div>
+
+      <div class="border-ink/30 mt-6 border-t-2 pt-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <span class="text-sm"
+            >or take the json for <code class="font-mono">data-frame-map</code
+            ></span
+          >
+          <button id="pg-download" class="btn" type="button" disabled
+            >download</button
+          >
+        </div>
+        <p id="pg-serve" class="label mt-2 opacity-60">
           serve the json next to the image and point data-frame-map at it.
         </p>
       </div>
-      <p class="mt-6 text-sm text-faded">
-        no art yet? <a href="/recipe" class="prose-link"
-          >generate a sheet with the recipe</a
-        >.
-      </p>
-    </section>
+    </Window>
   </main>
 
   <script>
@@ -299,15 +281,23 @@ import Layout from "../layouts/Layout.astro";
     initPlayground();
   </script>
 
-  <style>
-    .pixel-btn:disabled,
-    .pixel-btn:disabled:hover {
-      transform: none;
-      box-shadow: 4px 4px 0 0 rgb(0 0 0 / 0.45);
-      border-color: var(--color-line);
-      color: var(--color-faded);
-      opacity: 0.45;
+  <style is:global>
+    .btn:disabled,
+    .btn-amber:disabled {
+      opacity: 0.4;
       cursor: not-allowed;
+    }
+    .btn:disabled:hover {
+      background: var(--color-paper);
+      color: var(--color-ink);
+    }
+    .btn-amber:disabled:hover {
+      background: var(--color-amber);
+      color: var(--color-ink);
+    }
+    .btn:disabled:active,
+    .btn-amber:disabled:active {
+      translate: none;
     }
   </style>
 </Layout>
