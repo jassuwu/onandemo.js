@@ -1,6 +1,6 @@
 {
   "name": "onandemo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "oneko.js, but anything chases your cursor",
   "license": "MIT",
   "type": "module",
