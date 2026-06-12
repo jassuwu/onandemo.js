@@ -1,25 +1,318 @@
 ---
-import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+
+const scriptSnippet = `<script src="https://unpkg.com/onandemo/dist/onandemo.js"><\/script>`;
+const npmSnippet = `bun add onandemo`;
+const importSnippet = `import { onandemo } from "onandemo";
+
+const destroy = onandemo(); // the cat
+onandemo({ sheet: "/dino.png", frameMap }); // anything`;
+const slimeSnippet = `{
+  "cellSize": 32,
+  "scale": 2,
+  "states": {
+    "idle": [[0,0],[1,0],[2,0]],
+    "E": [[3,0],[4,0],[5,0],[6,0]],
+    "splat": [[10,0],[11,0],[12,0],[13,0]]
+  }
+}`;
+
+const knobs = [
+  ["sheet + frameMap", "—", "your art and its map"],
+  ["preset", '"neko"', "bundled companion by name"],
+  ["speed", "10", "chase speed in px per tick"],
+  ["restRadius", "48", "distance inside which it rests"],
+  ["scale", "1", "display multiplier"],
+  ["zIndex", "2147483647", "stacking"],
+  ["persist", "true", "remembers its position across loads"],
+];
+
+const manners = [
+  "bails out entirely under prefers-reduced-motion — no element, no listeners.",
+  "never intercepts input and hides from assistive tech.",
+  "the loop dies when the element leaves the DOM.",
+  "remembers where it was (persist: false is the one opt-out).",
+  "ten frames per second, always. the shuffle is the charm.",
+];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="oneko.js, but anything chases your cursor."
-    />
-    <title>onandemo.js</title>
-  </head>
-  <body
-    class="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-100"
-  >
-    <main class="flex flex-col items-center gap-2 text-center">
-      <h1 class="text-2xl font-semibold tracking-tight">onandemo.js</h1>
-      <p class="text-neutral-400">oneko.js, but anything chases your cursor.</p>
-      <p class="text-sm text-neutral-600">site under construction</p>
-    </main>
-  </body>
-</html>
+<Layout>
+  <main class="mx-auto max-w-5xl px-6">
+    <!-- hero -->
+    <section class="pt-16 pb-20 sm:pt-24">
+      <p class="kicker">o-nandemo (何でも) — "anything"</p>
+      <h1
+        class="mt-3 text-6xl font-bold tracking-tight text-balance sm:text-8xl"
+      >
+        onandemo.js
+      </h1>
+      <p class="mt-4 max-w-xl text-xl text-faded italic">
+        oneko.js, but anything chases your cursor.
+      </p>
+      <p class="mt-8 font-pixel text-xs text-faded">
+        it's already chasing you. who's next:
+      </p>
+      <div class="mt-3 flex flex-wrap gap-3" id="switcher">
+        <button class="pixel-btn" data-preset="neko" aria-pressed="true"
+          >neko</button
+        >
+        <button class="pixel-btn" data-preset="soldier" aria-pressed="false"
+          >soldier</button
+        >
+        <button class="pixel-btn" data-preset="slime" aria-pressed="false"
+          >slime</button
+        >
+      </div>
+    </section>
+
+    <div class="dither"></div>
+
+    <!-- install -->
+    <section class="py-16">
+      <p class="kicker">use it</p>
+      <h2 class="mt-2 text-3xl font-semibold">one tag, zero config</h2>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <div class="pixel-card p-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="font-pixel text-xs text-faded">drop-in</span>
+            <button class="pixel-btn" data-copy={scriptSnippet}>copy</button>
+          </div>
+          <pre
+            class="mt-4 overflow-x-auto font-mono text-sm text-amber"><code>{scriptSnippet}</code></pre>
+          <p class="mt-3 text-sm text-faded">
+            swap with <code class="font-mono text-cream"
+              >data-preset="soldier"</code
+            > or <code class="font-mono text-cream">data-preset="slime"</code> — the
+            files ship inside the package.
+          </p>
+        </div>
+        <div class="pixel-card p-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="font-pixel text-xs text-faded">npm</span>
+            <button class="pixel-btn" data-copy={npmSnippet}>copy</button>
+          </div>
+          <pre
+            class="mt-4 overflow-x-auto font-mono text-sm text-amber"><code>{npmSnippet}</code></pre>
+          <pre
+            class="mt-3 overflow-x-auto font-mono text-sm text-faded"><code>{importSnippet}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="dither"></div>
+
+    <!-- sheet anatomy -->
+    <section class="py-16">
+      <p class="kicker">the frame map</p>
+      <h2 class="mt-2 text-3xl font-semibold">anatomy of a companion</h2>
+      <p class="mt-3 max-w-2xl text-faded">
+        a sheet is a grid of cells; a frame map names them. this is the actual
+        cat — all 32 cells, mapped. hover around.
+      </p>
+      <div class="mt-8 overflow-x-auto pb-2">
+        <div
+          id="anatomy"
+          class="relative w-[768px] border-2 border-line select-none"
+          style="image-rendering: pixelated;"
+        >
+          <img
+            src="/presets/neko.gif"
+            alt="the classic cat sprite sheet, 8 by 4 cells"
+            width="768"
+            height="384"
+            class="block"
+            style="image-rendering: pixelated;"
+            draggable="false"
+          />
+          <div class="absolute inset-0 grid grid-cols-8 grid-rows-4"></div>
+        </div>
+      </div>
+      <p class="mt-3 h-6 font-pixel text-xs">
+        <span class="text-faded">cell:</span>
+        <span id="anatomy-readout" class="text-amber">hover a cell</span>
+      </p>
+    </section>
+
+    <div class="dither"></div>
+
+    <!-- bring anything -->
+    <section class="py-16">
+      <p class="kicker">two states make a companion</p>
+      <h2 class="mt-2 text-3xl font-semibold">bring anything</h2>
+      <div class="mt-8 grid items-start gap-6 sm:grid-cols-2">
+        <div class="pixel-card p-5">
+          <span class="font-pixel text-xs text-faded"
+            >slime.json — complete</span
+          >
+          <pre
+            class="mt-4 overflow-x-auto font-mono text-sm text-faded"><code>{slimeSnippet}</code></pre>
+        </div>
+        <div class="space-y-4 text-faded">
+          <p>
+            <code class="font-mono text-cream">idle</code> plus one run direction
+            is a legal companion. missing directions resolve down a ladder — mirror,
+            snap, fall back — so the slime's side-view hop chases in all eight.
+          </p>
+          <p>
+            every other state name is an <strong class="text-cream"
+              >antic</strong
+            >: a rare idle performance, triggered the oneko way — only after
+            lingering.
+          </p>
+          <p>
+            <a href="/playground" class="prose-link"
+              >slice your own sheet in the playground</a
+            > or <a href="/recipe" class="prose-link"
+              >generate one with the recipe</a
+            >.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="dither"></div>
+
+    <!-- knobs + manners -->
+    <section class="py-16">
+      <div class="grid gap-10 sm:grid-cols-2">
+        <div>
+          <p class="kicker">the knobs</p>
+          <table class="mt-4 w-full font-mono text-sm">
+            <tbody>
+              {
+                knobs.map(([knob, def, what]) => (
+                  <tr class="border-b border-line/60">
+                    <td class="py-2 pr-3 text-amber">{knob}</td>
+                    <td class="py-2 pr-3 text-faded">{def}</td>
+                    <td class="py-2 text-cream">{what}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p class="kicker">the manners</p>
+          <ul class="mt-4 space-y-3 text-faded">
+            {
+              manners.map((m) => (
+                <li class="flex gap-3">
+                  <span class="font-pixel text-xs text-amber">+</span>
+                  <span>{m}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-6 text-sm text-faded">
+            inherited from oneko, engine behavior rather than options. not
+            configurable on purpose.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    import type { PresetName } from "../lib/companion.ts";
+
+    // switcher
+    const switcher = document.getElementById("switcher");
+    switcher?.addEventListener("click", (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>(
+        "[data-preset]",
+      );
+      if (!btn) return;
+      void window.companion.summon(btn.dataset["preset"] as PresetName);
+      for (const b of switcher.querySelectorAll("[data-preset]")) {
+        b.setAttribute("aria-pressed", String(b === btn));
+      }
+    });
+
+    // anatomy: the cat's cells, labeled (mirrors the bundled neko frame map)
+    const STATES: Record<string, string> = {};
+    const label = (name: string, cells: [number, number][]) => {
+      cells.forEach(([c, r], i) => {
+        STATES[`${c},${r}`] = `${name} · frame ${i + 1}/${cells.length}`;
+      });
+    };
+    label("idle", [[3, 3]]);
+    label("alert", [[7, 3]]);
+    label("N", [
+      [1, 2],
+      [1, 3],
+    ]);
+    label("NE", [
+      [0, 2],
+      [0, 3],
+    ]);
+    label("E", [
+      [3, 0],
+      [3, 1],
+    ]);
+    label("SE", [
+      [5, 1],
+      [5, 2],
+    ]);
+    label("S", [
+      [6, 3],
+      [7, 2],
+    ]);
+    label("SW", [
+      [5, 3],
+      [6, 1],
+    ]);
+    label("W", [
+      [4, 2],
+      [4, 3],
+    ]);
+    label("NW", [
+      [1, 0],
+      [1, 1],
+    ]);
+    label("sleeping (antic)", [
+      [2, 0],
+      [2, 1],
+    ]);
+    label("tired (antic)", [[3, 2]]);
+    label("scratchSelf (antic)", [
+      [5, 0],
+      [6, 0],
+      [7, 0],
+    ]);
+    label("scratchWallN (antic)", [
+      [0, 0],
+      [0, 1],
+    ]);
+    label("scratchWallS (antic)", [
+      [7, 1],
+      [6, 2],
+    ]);
+    label("scratchWallE (antic)", [
+      [2, 2],
+      [2, 3],
+    ]);
+    label("scratchWallW (antic)", [
+      [4, 0],
+      [4, 1],
+    ]);
+
+    const grid = document.querySelector("#anatomy .grid");
+    const readout = document.getElementById("anatomy-readout");
+    if (grid && readout) {
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 8; col++) {
+          const cell = document.createElement("div");
+          cell.className =
+            "hover:outline hover:outline-2 hover:-outline-offset-2 hover:outline-amber hover:bg-amber/10";
+          cell.addEventListener("mouseenter", () => {
+            readout.textContent = `[${col}, ${row}] — ${STATES[`${col},${row}`] ?? "unmapped"}`;
+          });
+          grid.appendChild(cell);
+        }
+      }
+      grid.addEventListener("mouseleave", () => {
+        readout.textContent = "hover a cell";
+      });
+    }
+  </script>
+</Layout>
