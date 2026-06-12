@@ -19,6 +19,7 @@ Controlled vocabulary. Use these terms exactly; avoid the listed synonyms.
 - **Rest radius** — the distance (default 48 px) inside which the companion stops chasing and idles; it also rests within one `speed` step (oneko's overshoot guard), so the effective rest distance is the larger of the two. _Avoid_: threshold, dead zone, stop distance.
 - **Recipe** — the published prompt template a user pastes into their own image model to get back a compliant Sheet; onandemo never calls a model itself (ADR-0004). _Avoid_: generator, AI feature, prompt (bare, in user-facing copy).
 - **Manners** — the courtesies inherited from oneko, engine behavior rather than options: the reduced-motion bail, position memory, self-cleanup, staying out of input and the accessibility tree, the fixed 10 fps tick (ADR-0009). _Avoid_: settings, defaults (manners can't be configured away; persistence is the lone opt-out).
+- **Mint** — turning a sheet + frame map into a companion link: the whole creature base64url'd into the `/c` URL fragment, touching no server (ADR-0011). _Avoid_: export (a mint is a link, not a file), upload (nothing leaves the tab), save.
 
 ## Shape
 
