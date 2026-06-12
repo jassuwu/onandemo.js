@@ -24,7 +24,18 @@ the oneko bitmap lineage as arranged by
   CARDCAPTOR SAKURA characters (CLAMP / Kodansha) are carved out of the grant —
   and none of them are bundled here.
 
-future presets are bundled only under CC0 or public-domain licenses, and each
-one gets its receipts in this file.
+## soldier & slime
 
-_last verified: 2026-06-11._
+`presets/soldier.png` (Soldier-Blue) and `presets/slime.png` ship unmodified
+from **Puny Characters** by Shade (Merchant Shade) —
+<https://opengameart.org/content/puny-characters> — license **CC0**, stated on
+the OpenGameArt page ("License(s): CC0") and on the itch.io page: "LICENSE
+(CC0) — feel free to use this for your game (commercially or not) … no need to
+give me credit." credit given anyway: thanks, Shade.
+
+---
+
+presets are bundled only under CC0 or public-domain licenses, and each one
+gets its receipts in this file.
+
+_last verified: 2026-06-12._

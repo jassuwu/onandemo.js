@@ -42,8 +42,29 @@ async function init(): Promise<void> {
       );
     }
     options.frameMap = (await res.json()) as FrameMap;
-  } else if (d["preset"] !== undefined) {
-    options.preset = d["preset"];
+  } else if (d["preset"] !== undefined && d["preset"] !== "neko") {
+    // package presets resolve relative to the script itself (ADR-0006): the
+    // same unpkg/jsdelivr/self-hosted copy serves its own preset files
+    const name = d["preset"];
+    if (!/^[a-z0-9-]+$/.test(name)) {
+      console.warn(
+        `onandemo: ignoring data-preset="${name}" — not a preset name`,
+      );
+      return;
+    }
+    const jsonUrl = new URL(
+      `../presets/${name}.json`,
+      script?.src ?? document.baseURI,
+    );
+    const res = await fetch(jsonUrl);
+    if (!res.ok) {
+      throw new Error(
+        `onandemo: no preset \`${name}\` at ${jsonUrl.href} (${res.status})`,
+      );
+    }
+    const preset = (await res.json()) as { sheet: string; frameMap: FrameMap };
+    options.sheet = new URL(preset.sheet, jsonUrl).href;
+    options.frameMap = preset.frameMap;
   }
   // no attributes at all: the neko homage, zero config
   onandemo(options);
