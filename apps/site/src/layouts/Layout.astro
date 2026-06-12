@@ -105,7 +105,8 @@ const nav = [
       import { preview, summon, who } from "../lib/companion.ts";
 
       window.companion = { summon, preview, who };
-      if (location.pathname !== "/c") void summon("neko");
+      // /c owns its own mount (trailing slash included — hosts differ)
+      if (!/^\/c\/?$/.test(location.pathname)) void summon("neko");
 
       // the one easter egg: how far has it run for you
       const odometer = document.getElementById("odometer");

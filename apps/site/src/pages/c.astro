@@ -1,0 +1,76 @@
+---
+import Window from "../components/Window.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="you've been sent a companion — onandemo.js"
+  description="a companion link: the whole creature is base64url'd into the url fragment. open it, get chased. nothing was uploaded anywhere."
+>
+  <main
+    class="mx-auto flex min-h-[70dvh] max-w-6xl items-center justify-center px-4 py-10 sm:px-6"
+  >
+    <Window title="you've been sent a companion" class="w-full max-w-lg">
+      <p class="label">a whole creature, url-shaped</p>
+      <p id="c-line" class="mt-3" aria-live="polite">
+        someone minted this and sent it to you. it lives entirely in the link —
+        nothing was uploaded anywhere.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="/playground" class="btn-amber inline-block">make your own</a>
+        <a href="/" class="btn inline-block">what is this</a>
+        <button id="c-keep" class="btn" type="button"
+          >keep the cat instead</button
+        >
+      </div>
+      <noscript>
+        <p class="label mt-5">
+          the creature decodes in your tab — it needs javascript.
+        </p>
+      </noscript>
+    </Window>
+  </main>
+
+  <script>
+    import { preview, summon, who } from "../lib/companion.ts";
+    import { unmint } from "../lib/mint.ts";
+
+    // the layout deliberately skips the neko boot on /c — this page owns the
+    // mount. preview/summon are imported straight from the module (the same
+    // instance the layout wires onto window.companion) because this script
+    // evaluates first.
+    const chip = document.querySelector<HTMLElement>("main .title-chip");
+    const line = document.getElementById("c-line");
+    const keep = document.getElementById("c-keep");
+
+    const payload = unmint(location.hash.slice(1));
+
+    if (payload) {
+      const { sheet, frameMap } = payload;
+      preview(sheet, frameMap);
+
+      // if the host serves this page at /c/ the layout's pathname check
+      // misses and boots neko after us; take the mount back.
+      setTimeout(() => {
+        if (who() !== "custom") preview(sheet, frameMap);
+      }, 0);
+
+      keep?.addEventListener("click", () => {
+        void summon("neko");
+        keep?.setAttribute("aria-pressed", "true");
+        if (line) {
+          line.textContent =
+            "the cat it is. the minted creature still lives in this link if you change your mind.";
+        }
+      });
+    } else {
+      void summon("neko");
+      keep?.remove();
+      if (chip) chip.textContent = "this link lost its creature";
+      if (line) {
+        line.textContent =
+          "the fragment didn't decode into a companion — long links sometimes get truncated in transit. a cat is keeping you company instead.";
+      }
+    }
+  </script>
+</Layout>
