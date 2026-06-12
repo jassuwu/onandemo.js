@@ -1,0 +1,5 @@
+{
+  "installCommand": "bun install",
+  "buildCommand": "bunx turbo build --filter=site",
+  "outputDirectory": "apps/site/dist"
+}

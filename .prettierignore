@@ -1,0 +1,6 @@
+bun.lock
+dist/
+out/
+.turbo/
+.astro/
+.vercel/
