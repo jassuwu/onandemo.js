@@ -1,0 +1,43 @@
+{
+  "name": "onandemo",
+  "version": "0.0.1",
+  "description": "oneko.js, but anything chases your cursor",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "bun": "./index.ts",
+      "import": "./dist/index.js"
+    },
+    "./script": "./dist/onandemo.js",
+    "./presets/*": "./presets/*"
+  },
+  "files": [
+    "dist",
+    "index.ts",
+    "src",
+    "presets",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun build ./index.ts --outdir dist --format esm --minify && bun build ./index.ts --outfile dist/onandemo.js --format iife --minify",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "cursor",
+    "oneko",
+    "companion",
+    "pixel-art",
+    "sprite-sheet",
+    "mascot"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^6.0.3"
+  }
+}
