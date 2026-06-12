@@ -1,121 +1,144 @@
 @import "tailwindcss";
 
-/* the desktop at dusk: espresso dark, phosphor amber, pixel-stepped edges */
+/* system 7, 1-bit: paper, ink, dither. color belongs to companions (ADR-0010). */
 @theme {
-  --color-ink: #181208;
-  --color-soot: #221a0d;
-  --color-line: #3d2f1a;
-  --color-cream: #f4e9d3;
-  --color-faded: #b3a384;
-  --color-amber: #ffb347;
-  --color-ember: #ff7847;
+  --color-paper: #ffffff;
+  --color-ink: #000000;
+  --color-amber: #f59e0b; /* fills, on creature affordances only */
+  --color-amber-deep: #b45309; /* amber as text on paper */
 
-  --font-body: "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-body: "DotGothic16", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
   --font-pixel: "Silkscreen", ui-monospace, monospace;
 }
 
 ::selection {
-  background: var(--color-amber);
-  color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
 }
 
-html {
-  scrollbar-color: var(--color-line) var(--color-ink);
+/* the classic 50% dither — the desktop itself */
+.desktop {
+  background-color: var(--color-paper);
+  background-image: conic-gradient(
+    var(--color-ink) 90deg,
+    transparent 90deg 180deg,
+    var(--color-ink) 180deg 270deg,
+    transparent 270deg
+  );
+  background-size: 4px 4px;
 }
 
-/* faint crt veil under the companion (it sits at max z-index) */
-.scanlines {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2147483640;
+.window {
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  box-shadow: 4px 4px 0 0 var(--color-ink);
+}
+
+/* pinstriped title bar, close box left, centered paper chip — system 7 grammar */
+.window-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid var(--color-ink);
+  padding: 6px 32px;
   background: repeating-linear-gradient(
     0deg,
-    rgb(0 0 0 / 0.22) 0 1px,
-    transparent 1px 3px
+    var(--color-ink) 0 1px,
+    var(--color-paper) 1px 4px
   );
-  opacity: 0.3;
 }
 
-.pixel-card {
-  border: 2px solid var(--color-line);
-  background: var(--color-soot);
-  box-shadow: 6px 6px 0 0 rgb(0 0 0 / 0.45);
+.window-title .close-box {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
 }
 
-.pixel-btn {
-  border: 2px solid var(--color-line);
-  background: var(--color-soot);
-  color: var(--color-cream);
-  box-shadow: 4px 4px 0 0 rgb(0 0 0 / 0.45);
-  font-family: var(--font-pixel);
-  font-size: 0.75rem;
-  padding: 0.5rem 0.875rem;
-  cursor: pointer;
-  transition:
-    transform 60ms steps(2),
-    box-shadow 60ms steps(2);
-}
-
-.pixel-btn:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 0 rgb(0 0 0 / 0.45);
-  border-color: var(--color-amber);
-}
-
-.pixel-btn:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
-}
-
-.pixel-btn[aria-pressed="true"] {
-  border-color: var(--color-amber);
-  color: var(--color-amber);
-}
-
-/* checkerboard seam between sections — the dither band */
-.dither {
-  height: 10px;
-  background-image:
-    linear-gradient(
-      45deg,
-      var(--color-line) 25%,
-      transparent 25% 75%,
-      var(--color-line) 75%
-    ),
-    linear-gradient(
-      45deg,
-      var(--color-line) 25%,
-      transparent 25% 75%,
-      var(--color-line) 75%
-    );
-  background-size: 6px 6px;
-  background-position:
-    0 0,
-    3px 3px;
-  opacity: 0.5;
-}
-
-.kicker {
+.window-title .title-chip {
+  background: var(--color-paper);
+  padding: 0 10px;
   font-family: var(--font-pixel);
   font-size: 0.7rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* system 7 button: ink on paper, inversion on hover */
+.btn {
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  padding: 0.3rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.btn:active {
+  translate: 1px 1px;
+}
+
+.btn[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* creature affordances are the only color on the desktop */
+.btn-amber {
+  border: 2px solid var(--color-ink);
+  background: var(--color-amber);
+  color: var(--color-ink);
+  padding: 0.3rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-amber:hover {
+  background: var(--color-ink);
   color: var(--color-amber);
+}
+
+.btn-amber:active {
+  translate: 1px 1px;
+}
+
+.btn-amber[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-amber);
+}
+
+.label {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
 }
 
 .prose-link {
-  color: var(--color-amber);
+  color: var(--color-ink);
   text-decoration: underline;
-  text-decoration-style: dotted;
+  text-decoration-thickness: 2px;
   text-underline-offset: 3px;
 }
 
 .prose-link:hover {
-  color: var(--color-ember);
+  background: var(--color-ink);
+  color: var(--color-paper);
 }
 
 :focus-visible {
-  outline: 2px dashed var(--color-amber);
-  outline-offset: 3px;
+  outline: 2px dashed var(--color-ink);
+  outline-offset: 2px;
 }

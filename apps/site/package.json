@@ -10,8 +10,8 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@fontsource-variable/bricolage-grotesque": "^5.2.10",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@fontsource/dotgothic16": "^5.2.8",
     "@fontsource/silkscreen": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.4.6",

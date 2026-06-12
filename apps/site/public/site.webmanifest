@@ -4,8 +4,8 @@
   "description": "oneko.js, but anything chases your cursor.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#181208",
-  "theme_color": "#181208",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/icon-192.png",

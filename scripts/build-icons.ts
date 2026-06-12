@@ -35,8 +35,8 @@ const manifest = {
   description: "oneko.js, but anything chases your cursor.",
   start_url: "/",
   display: "standalone",
-  background_color: C.ink,
-  theme_color: C.ink,
+  background_color: C.paper,
+  theme_color: C.paper,
   icons: [
     { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
     { src: "/icon-512.png", sizes: "512x512", type: "image/png" },

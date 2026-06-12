@@ -1,9 +1,8 @@
-/** onandemo's dusk system — mirror of apps/site/src/styles/global.css @theme. */
+/** onandemo's 1-bit system — mirror of apps/site/src/styles/global.css @theme (ADR-0010). */
 export const C = {
-  ink: "#181208",
-  cream: "#f4e9d3",
-  amber: "#ffb347",
-  faded: "#b3a384",
+  paper: "#ffffff",
+  ink: "#000000",
+  amber: "#f59e0b", // color belongs to companions, even here
 } as const;
 
 // 16×16 logical pixels, drawn as rects so it stays pixel art at every size.
@@ -63,10 +62,10 @@ const chaser: [number, number][] = [
 ];
 
 const PIXELS: Px[] = [
-  ...cursor.map(([x, y]): Px => [x, y, C.cream]),
+  ...cursor.map(([x, y]): Px => [x, y, C.ink]),
   ...chaser.map(([x, y]): Px => [x, y, C.amber]),
   [11, 11, C.ink], // the eye, looking at the cursor
-  [14, 14, C.faded], // one px of dust behind it
+  [14, 14, C.ink], // one px of dust behind it
 ];
 
 const r = (n: number) => Number(n.toFixed(2));
@@ -84,23 +83,23 @@ function svg(body: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}" width="${VIEW}" height="${VIEW}" shape-rendering="crispEdges">${body}</svg>`;
 }
 
-/** rounded dark tile — the browser-tab favicon. */
+/** paper tile with an ink frame — the browser-tab favicon. */
 export function faviconSvg(): string {
   return svg(
-    `<rect width="${VIEW}" height="${VIEW}" rx="12" fill="${C.ink}"/>${mark(2)}`,
+    `<rect width="${VIEW}" height="${VIEW}" rx="12" fill="${C.paper}"/><rect x="1.5" y="1.5" width="${VIEW - 3}" height="${VIEW - 3}" rx="10" fill="none" stroke="${C.ink}" stroke-width="3"/>${mark(4)}`,
   );
 }
 
 /** full-bleed square — apple-touch + standard PWA icons (the OS rounds it). */
 export function solidSvg(): string {
   return svg(
-    `<rect width="${VIEW}" height="${VIEW}" fill="${C.ink}"/>${mark(6)}`,
+    `<rect width="${VIEW}" height="${VIEW}" fill="${C.paper}"/>${mark(6)}`,
   );
 }
 
 /** full-bleed with a generous safe zone for android maskable icons. */
 export function maskableSvg(): string {
   return svg(
-    `<rect width="${VIEW}" height="${VIEW}" fill="${C.ink}"/>${mark(12)}`,
+    `<rect width="${VIEW}" height="${VIEW}" fill="${C.paper}"/>${mark(12)}`,
   );
 }

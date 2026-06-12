@@ -1,4 +1,5 @@
 ---
+import Window from "../components/Window.astro";
 import Layout from "../layouts/Layout.astro";
 
 const scriptSnippet = `<script src="https://unpkg.com/onandemo/dist/onandemo.js"><\/script>`;
@@ -7,112 +8,133 @@ const importSnippet = `import { onandemo } from "onandemo";
 
 const destroy = onandemo(); // the cat
 onandemo({ sheet: "/dino.png", frameMap }); // anything`;
-const slimeSnippet = `{
-  "cellSize": 32,
-  "scale": 2,
-  "states": {
-    "idle": [[0,0],[1,0],[2,0]],
-    "E": [[3,0],[4,0],[5,0],[6,0]],
-    "splat": [[10,0],[11,0],[12,0],[13,0]]
-  }
-}`;
 
 const knobs = [
   ["sheet + frameMap", "—", "your art and its map"],
   ["preset", '"neko"', "bundled companion by name"],
-  ["speed", "10", "chase speed in px per tick"],
-  ["restRadius", "48", "distance inside which it rests"],
+  ["speed", "10", "px per tick"],
+  ["restRadius", "48", "rest distance"],
   ["scale", "1", "display multiplier"],
   ["zIndex", "2147483647", "stacking"],
-  ["persist", "true", "remembers its position across loads"],
+  ["persist", "true", "remembers its spot"],
 ];
 
 const manners = [
-  "bails out entirely under prefers-reduced-motion — no element, no listeners.",
-  "never intercepts input and hides from assistive tech.",
+  "bails out under prefers-reduced-motion — no element, no listeners.",
+  "never intercepts input; hidden from assistive tech.",
   "the loop dies when the element leaves the DOM.",
-  "remembers where it was (persist: false is the one opt-out).",
+  "remembers where it was (persist: false opts out).",
   "ten frames per second, always. the shuffle is the charm.",
+];
+
+const ladder = [
+  [
+    "01",
+    "try",
+    "summon the bundled three — they're loose on this desktop already.",
+  ],
+  [
+    "02",
+    "make",
+    "no art skills? the recipe prompts your image model. have pixels? the playground slices anything.",
+  ],
+  [
+    "03",
+    "mint",
+    "the playground turns your creature into a link. send it; whoever opens it gets chased. nothing uploads — the whole companion lives in the url.",
+  ],
+  [
+    "04",
+    "immortalize",
+    "pr your companion into the package. it ships on npm, works as data-preset everywhere, and notice.md credits you.",
+  ],
 ];
 ---
 
 <Layout>
-  <main class="mx-auto max-w-5xl px-6">
-    <!-- hero -->
-    <section class="pt-16 pb-20 sm:pt-24">
-      <p class="kicker">o-nandemo (何でも) — "anything"</p>
-      <h1
-        class="mt-3 text-6xl font-bold tracking-tight text-balance sm:text-8xl"
-      >
+  <main class="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
+    <!-- about -->
+    <Window title="about onandemo.js" class="max-w-3xl">
+      <p class="label">o-nandemo (何でも) — "anything"</p>
+      <h1 class="mt-2 text-5xl font-bold tracking-tight sm:text-7xl">
         onandemo.js
       </h1>
-      <p class="mt-4 max-w-xl text-xl text-faded italic">
-        oneko.js, but anything chases your cursor.
-      </p>
-      <p class="mt-8 font-pixel text-xs text-faded">
-        it's already chasing you. who's next:
-      </p>
+      <p class="mt-3 text-xl">oneko.js, but anything chases your cursor.</p>
+      <p class="label mt-8">it's already chasing you. who's next:</p>
       <div class="mt-3 flex flex-wrap gap-3" id="switcher">
-        <button class="pixel-btn" data-preset="neko" aria-pressed="true"
+        <button class="btn-amber" data-preset="neko" aria-pressed="true"
           >neko</button
         >
-        <button class="pixel-btn" data-preset="soldier" aria-pressed="false"
+        <button class="btn-amber" data-preset="soldier" aria-pressed="false"
           >soldier</button
         >
-        <button class="pixel-btn" data-preset="slime" aria-pressed="false"
+        <button class="btn-amber" data-preset="slime" aria-pressed="false"
           >slime</button
         >
       </div>
-    </section>
-
-    <div class="dither"></div>
+      <p class="mt-5 text-sm">
+        or <a href="/playground" class="prose-link">mint one of your own</a>.
+      </p>
+    </Window>
 
     <!-- install -->
-    <section class="py-16">
-      <p class="kicker">use it</p>
-      <h2 class="mt-2 text-3xl font-semibold">one tag, zero config</h2>
-      <div class="mt-8 grid gap-6 sm:grid-cols-2">
-        <div class="pixel-card p-5">
-          <div class="flex items-baseline justify-between gap-3">
-            <span class="font-pixel text-xs text-faded">drop-in</span>
-            <button class="pixel-btn" data-copy={scriptSnippet}>copy</button>
-          </div>
-          <pre
-            class="mt-4 overflow-x-auto font-mono text-sm text-amber"><code>{scriptSnippet}</code></pre>
-          <p class="mt-3 text-sm text-faded">
-            swap with <code class="font-mono text-cream"
-              >data-preset="soldier"</code
-            > or <code class="font-mono text-cream">data-preset="slime"</code> — the
-            files ship inside the package.
-          </p>
+    <div class="grid items-start gap-10 lg:grid-cols-2">
+      <Window title="install">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="label">drop-in</span>
+          <button class="btn" data-copy={scriptSnippet}>copy</button>
         </div>
-        <div class="pixel-card p-5">
-          <div class="flex items-baseline justify-between gap-3">
-            <span class="font-pixel text-xs text-faded">npm</span>
-            <button class="pixel-btn" data-copy={npmSnippet}>copy</button>
-          </div>
-          <pre
-            class="mt-4 overflow-x-auto font-mono text-sm text-amber"><code>{npmSnippet}</code></pre>
-          <pre
-            class="mt-3 overflow-x-auto font-mono text-sm text-faded"><code>{importSnippet}</code></pre>
+        <pre
+          class="border-ink mt-3 overflow-x-auto border-2 p-3 font-mono text-sm"><code>{scriptSnippet}</code></pre>
+        <p class="mt-3 text-sm">
+          swap with <code class="font-mono">data-preset="soldier"</code> or
+          <code class="font-mono">"slime"</code> — the files ship inside the package.
+        </p>
+        <div class="mt-5 flex items-baseline justify-between gap-3">
+          <span class="label">npm</span>
+          <button class="btn" data-copy={npmSnippet}>copy</button>
         </div>
-      </div>
-    </section>
+        <pre
+          class="border-ink mt-3 overflow-x-auto border-2 p-3 font-mono text-sm"><code>{npmSnippet}</code></pre>
+        <pre
+          class="mt-3 overflow-x-auto p-1 font-mono text-sm"><code>{importSnippet}</code></pre>
+      </Window>
 
-    <div class="dither"></div>
+      <!-- make your own: the ladder -->
+      <Window title="make your own">
+        <ol class="space-y-4">
+          {
+            ladder.map(([num, name, what]) => (
+              <li class="flex gap-4">
+                <span class="label text-amber-deep mt-1 shrink-0">{num}</span>
+                <span>
+                  <strong class="font-bold">{name}</strong> — {what}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="/playground" class="btn-amber inline-block">playground</a>
+          <a href="/recipe" class="btn inline-block">recipe</a>
+          <a
+            href="https://github.com/jassuwu/onandemo.js/blob/main/CONTRIBUTING.md"
+            class="btn inline-block">pr yours</a
+          >
+        </div>
+      </Window>
+    </div>
 
-    <!-- sheet anatomy -->
-    <section class="py-16">
-      <p class="kicker">the frame map</p>
-      <h2 class="mt-2 text-3xl font-semibold">anatomy of a companion</h2>
-      <p class="mt-3 max-w-2xl text-faded">
+    <!-- anatomy -->
+    <Window title="anatomy of a companion — neko.gif" class="max-w-fit">
+      <p class="max-w-2xl text-sm">
         a sheet is a grid of cells; a frame map names them. this is the actual
         cat — all 32 cells, mapped. hover around.
       </p>
-      <div class="mt-8 overflow-x-auto pb-2">
+      <div class="mt-5 overflow-x-auto pb-1">
         <div
           id="anatomy"
-          class="relative w-[768px] border-2 border-line select-none"
+          class="border-ink relative w-[768px] border-2 select-none"
           style="image-rendering: pixelated;"
         >
           <img
@@ -127,89 +149,47 @@ const manners = [
           <div class="absolute inset-0 grid grid-cols-8 grid-rows-4"></div>
         </div>
       </div>
-      <p class="mt-3 h-6 font-pixel text-xs">
-        <span class="text-faded">cell:</span>
-        <span id="anatomy-readout" class="text-amber">hover a cell</span>
+      <p class="label mt-3 h-5">
+        cell: <span id="anatomy-readout" class="text-amber-deep"
+          >hover a cell</span
+        >
       </p>
-    </section>
+    </Window>
 
-    <div class="dither"></div>
-
-    <!-- bring anything -->
-    <section class="py-16">
-      <p class="kicker">two states make a companion</p>
-      <h2 class="mt-2 text-3xl font-semibold">bring anything</h2>
-      <div class="mt-8 grid items-start gap-6 sm:grid-cols-2">
-        <div class="pixel-card p-5">
-          <span class="font-pixel text-xs text-faded"
-            >slime.json — complete</span
-          >
-          <pre
-            class="mt-4 overflow-x-auto font-mono text-sm text-faded"><code>{slimeSnippet}</code></pre>
-        </div>
-        <div class="space-y-4 text-faded">
-          <p>
-            <code class="font-mono text-cream">idle</code> plus one run direction
-            is a legal companion. missing directions resolve down a ladder — mirror,
-            snap, fall back — so the slime's side-view hop chases in all eight.
-          </p>
-          <p>
-            every other state name is an <strong class="text-cream"
-              >antic</strong
-            >: a rare idle performance, triggered the oneko way — only after
-            lingering.
-          </p>
-          <p>
-            <a href="/playground" class="prose-link"
-              >slice your own sheet in the playground</a
-            > or <a href="/recipe" class="prose-link"
-              >generate one with the recipe</a
-            >.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <div class="dither"></div>
-
-    <!-- knobs + manners -->
-    <section class="py-16">
-      <div class="grid gap-10 sm:grid-cols-2">
-        <div>
-          <p class="kicker">the knobs</p>
-          <table class="mt-4 w-full font-mono text-sm">
-            <tbody>
-              {
-                knobs.map(([knob, def, what]) => (
-                  <tr class="border-b border-line/60">
-                    <td class="py-2 pr-3 text-amber">{knob}</td>
-                    <td class="py-2 pr-3 text-faded">{def}</td>
-                    <td class="py-2 text-cream">{what}</td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <p class="kicker">the manners</p>
-          <ul class="mt-4 space-y-3 text-faded">
+    <!-- rules -->
+    <div class="grid items-start gap-10 lg:grid-cols-2">
+      <Window title="the knobs">
+        <table class="w-full font-mono text-sm">
+          <tbody>
             {
-              manners.map((m) => (
-                <li class="flex gap-3">
-                  <span class="font-pixel text-xs text-amber">+</span>
-                  <span>{m}</span>
-                </li>
+              knobs.map(([knob, def, what]) => (
+                <tr class="border-ink/30 border-b">
+                  <td class="py-2 pr-3 font-bold">{knob}</td>
+                  <td class="py-2 pr-3">{def}</td>
+                  <td class="py-2">{what}</td>
+                </tr>
               ))
             }
-          </ul>
-          <p class="mt-6 text-sm text-faded">
-            inherited from oneko, engine behavior rather than options. not
-            configurable on purpose.
-          </p>
-        </div>
-      </div>
-    </section>
+          </tbody>
+        </table>
+      </Window>
+      <Window title="the manners">
+        <ul class="space-y-3">
+          {
+            manners.map((m) => (
+              <li class="flex gap-3">
+                <span class="label mt-1">■</span>
+                <span>{m}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-5 text-sm">
+          inherited from oneko, engine behavior rather than options. not
+          configurable on purpose.
+        </p>
+      </Window>
+    </div>
   </main>
 
   <script>
@@ -303,7 +283,7 @@ const manners = [
         for (let col = 0; col < 8; col++) {
           const cell = document.createElement("div");
           cell.className =
-            "hover:outline hover:outline-2 hover:-outline-offset-2 hover:outline-amber hover:bg-amber/10";
+            "hover:outline hover:outline-2 hover:-outline-offset-2 hover:outline-ink hover:bg-amber/20";
           cell.addEventListener("mouseenter", () => {
             readout.textContent = `[${col}, ${row}] — ${STATES[`${col},${row}`] ?? "unmapped"}`;
           });

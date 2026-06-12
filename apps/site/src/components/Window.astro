@@ -1,0 +1,19 @@
+---
+interface Props {
+  title: string;
+  class?: string;
+  pad?: boolean;
+}
+
+const { title, class: cls, pad = true } = Astro.props;
+---
+
+<section class:list={["window", cls]}>
+  <header class="window-title">
+    <span class="close-box" aria-hidden="true"></span>
+    <span class="title-chip">{title}</span>
+  </header>
+  <div class:list={[pad && "p-5"]}>
+    <slot />
+  </div>
+</section>

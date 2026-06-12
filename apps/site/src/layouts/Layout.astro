@@ -1,5 +1,5 @@
 ---
-import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource/dotgothic16";
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource/silkscreen";
 import "../styles/global.css";
@@ -31,65 +31,73 @@ const nav = [
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL("/og.png", Astro.site)} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#181208" />
+    <meta name="theme-color" content="#ffffff" />
   </head>
-  <body class="bg-ink text-cream font-body min-h-dvh antialiased">
-    <div class="scanlines" aria-hidden="true"></div>
-
+  <body class="desktop text-ink font-body min-h-dvh">
+    <!-- the menu bar is the nav; the odometer sits where the clock goes -->
     <header
-      class="mx-auto flex max-w-5xl items-baseline justify-between px-6 py-5"
+      class="bg-paper border-ink sticky top-0 z-40 border-b-2 px-3 sm:px-5"
     >
-      <a href="/" class="font-semibold tracking-tight hover:text-amber"
-        >onandemo.js</a
-      >
-      <nav class="flex gap-5 text-sm">
-        {
-          nav.map((item) => (
-            <a
-              href={item.href}
-              class:list={[
-                "hover:text-amber",
-                path.startsWith(item.href)
-                  ? "text-amber underline decoration-dotted underline-offset-4"
-                  : "text-faded",
-              ]}
-            >
-              {item.label}
-            </a>
-          ))
-        }
-      </nav>
+      <div class="mx-auto flex max-w-6xl items-stretch justify-between">
+        <nav class="flex items-stretch">
+          <a
+            href="/"
+            class="hover:bg-ink hover:text-paper flex items-center gap-2 px-3 py-2 font-bold"
+          >
+            <img
+              src="/favicon.svg"
+              alt=""
+              width="16"
+              height="16"
+              class="inline-block"
+              style="image-rendering: pixelated;"
+            />
+            onandemo.js
+          </a>
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                class:list={[
+                  "flex items-center px-3 py-2",
+                  path.startsWith(item.href)
+                    ? "bg-ink text-paper"
+                    : "hover:bg-ink hover:text-paper",
+                ]}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+        <span class="label flex items-center gap-1.5">
+          px chased: <span id="odometer" class="text-amber-deep">000000</span>
+        </span>
+      </div>
     </header>
 
     <slot />
 
-    <footer class="mt-24">
-      <div class="dither"></div>
-      <div
-        class="mx-auto flex max-w-5xl flex-wrap items-baseline justify-between gap-4 px-6 py-8 text-sm text-faded"
-      >
-        <span class="font-pixel text-xs"
-          >px chased: <span id="odometer" class="text-amber">000000</span></span
+    <footer class="mx-auto max-w-6xl px-4 pt-4 pb-10 sm:px-6">
+      <div class="window inline-block px-4 py-2 text-sm">
+        <a
+          href="https://github.com/jassuwu/onandemo.js/blob/main/LICENSE"
+          class="prose-link">MIT</a
         >
-        <span>
-          <a
-            href="https://github.com/jassuwu/onandemo.js/blob/main/LICENSE"
-            class="prose-link">MIT</a
-          >
-          ·
-          <a
-            href="https://github.com/jassuwu/onandemo.js/blob/main/packages/onandemo/NOTICE.md"
-            class="prose-link">sprite receipts</a
-          >
-          · a love letter to
-          <a href="https://github.com/adryd325/oneko.js" class="prose-link"
-            >oneko.js</a
-          >
-        </span>
+        ·
+        <a
+          href="https://github.com/jassuwu/onandemo.js/blob/main/packages/onandemo/NOTICE.md"
+          class="prose-link">sprite receipts</a
+        >
+        · a love letter to
+        <a href="https://github.com/adryd325/oneko.js" class="prose-link"
+          >oneko.js</a
+        >
       </div>
     </footer>
 
@@ -97,7 +105,7 @@ const nav = [
       import { preview, summon, who } from "../lib/companion.ts";
 
       window.companion = { summon, preview, who };
-      void summon("neko");
+      if (location.pathname !== "/c") void summon("neko");
 
       // the one easter egg: how far has it run for you
       const odometer = document.getElementById("odometer");
