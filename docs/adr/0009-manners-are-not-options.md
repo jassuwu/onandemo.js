@@ -9,7 +9,7 @@ predictable future request, and it would be a different (worse) product.
 
 ## Considered options
 
-- **Expose `tickMs`:** rejected — the 10 fps shuffle *is* the charm; speed tunes in px per tick, never in tick rate.
+- **Expose `tickMs`:** rejected — the 10 fps shuffle _is_ the charm; speed tunes in px per tick, never in tick rate.
 - **Container/mount-target option:** deferred — v1 companions live on `document.body`, full-viewport, like every oneko ever (PLAN: Deferred to v2).
 
 ## Decision
@@ -22,7 +22,7 @@ Five **Manners** are engine behavior, not options:
 4. `pointer-events: none`, `aria-hidden`, `image-rendering: pixelated`, max-int z-index — never in your way, never in your accessibility tree.
 5. A fixed, unexposed 100 ms tick.
 
-The public surface is exactly six knobs — `preset` *or* `sheet` + `frameMap`, then
+The public surface is exactly six knobs — `preset` _or_ `sheet` + `frameMap`, then
 `speed`, `restRadius`, `scale`, `zIndex`, `persist` — mirrored as `data-*` attributes.
 
 ## Consequences

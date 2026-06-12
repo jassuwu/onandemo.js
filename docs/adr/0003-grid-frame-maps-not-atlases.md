@@ -22,5 +22,5 @@ oneko skin can port to by hand in minutes.
 ## Consequences
 
 - A frame map is plain JSON-able data: presets, docs, and the demo's bring-your-own-sheet playground all share one format.
-- Aseprite/TexturePacker support, if it comes, is an *adapter* that produces this descriptor (Deferred to v2) — the engine never learns about packed rects.
+- Aseprite/TexturePacker support, if it comes, is an _adapter_ that produces this descriptor (Deferred to v2) — the engine never learns about packed rects.
 - Porting the ecosystem's existing cat skins (spicetify-oneko's picker, the OneShot sprites) is a data exercise, which is the point.

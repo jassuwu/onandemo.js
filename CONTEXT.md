@@ -8,7 +8,7 @@ sprite sheet, chasing the mouse with oneko's exact manners.
 
 Controlled vocabulary. Use these terms exactly; avoid the listed synonyms.
 
-- **Companion** — the animated character that chases the cursor (the generalized cat). _Avoid_: pet, mascot, follower, sprite (the companion is driven *by* sprites; it isn't one).
+- **Companion** — the animated character that chases the cursor (the generalized cat). _Avoid_: pet, mascot, follower, sprite (the companion is driven _by_ sprites; it isn't one).
 - **Preset** — a bundled, ready-to-run companion: sheet + frame map + tuning, selectable by name. v1 ships `neko` (the homage) plus CC0 friends. _Avoid_: skin (the forks' word for re-arting the cat; a preset swaps the whole companion), theme.
 - **Sheet** — the sprite-sheet image: a uniform grid of fixed-size cells. _Avoid_: spritesheet (in prose), atlas (the packed-rect format we deliberately don't parse — see ADR-0003), texture.
 - **Cell** — one tile of a sheet, addressed `[col, row]` from the top-left. _Avoid_: frame (a frame is a cell shown at a tick; a cell is a position), tile.
