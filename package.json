@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "icons": "bun run scripts/build-icons.ts",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "publish": "turbo typecheck build --filter=onandemo && cd packages/onandemo && bun publish",
@@ -16,6 +17,7 @@
     "fmt:check": "prettier --check ."
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "prettier": "^3.8.4",
     "prettier-plugin-astro": "^0.14.1",
     "turbo": "^2.9.18"
