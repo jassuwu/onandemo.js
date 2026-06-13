@@ -1,8 +1,8 @@
 /**
- * the playground: slice a dropped image into a sheet of cells, deal cells to
- * states, hand the finished frame map to the live companion, and mint the
- * whole creature into a /c link (ADR-0011).
- * pure helpers up top; initPlayground() wires the page.
+ * the playground: drop a standard sheet (ADR-0012) and it maps itself — the
+ * companion is live before you touch a control. the "different layout?" fold
+ * exposes the hand slicer for arbitrary art. the finished creature mints into a
+ * /c link (ADR-0011). pure helpers up top; initPlayground() wires the page.
  */
 
 import type { Cell, FrameMap } from "onandemo";
@@ -20,6 +20,10 @@ const MIN_CELL = 4;
 
 /** past this many chars, chat apps start eating links (ADR-0011). */
 const LONG_LINK = 8000;
+
+/** the standard sheet: the neko 8×4 layout the recipe writes (ADR-0012). */
+const STD_COLS = 8;
+const STD_ROWS = 4;
 
 interface Model {
   file: File | null;
@@ -47,6 +51,87 @@ export function guessCell(n: number): number {
     }
   }
   return best;
+}
+
+/** a display multiplier that lands a cell near 44px on screen. */
+export function autoScale(cellH: number): number {
+  if (cellH <= 0) return 1;
+  return Math.min(4, Math.max(1, Math.round(44 / cellH)));
+}
+
+/** the base state map: reserved names, all empty, in chip order. */
+function baseStates(): Map<string, Cell[]> {
+  return new Map<string, Cell[]>([
+    ["idle", []],
+    ["alert", []],
+    ...DIRECTIONS.map((d): [string, Cell[]] => [d, []]),
+  ]);
+}
+
+/** the standard frame map: the exact neko 8×4 slot map the recipe writes. */
+export function standardStates(): Map<string, Cell[]> {
+  const m = baseStates();
+  m.set("idle", [[3, 3]]);
+  m.set("alert", [[7, 3]]);
+  m.set("N", [
+    [1, 2],
+    [1, 3],
+  ]);
+  m.set("NE", [
+    [0, 2],
+    [0, 3],
+  ]);
+  m.set("E", [
+    [3, 0],
+    [3, 1],
+  ]);
+  m.set("SE", [
+    [5, 1],
+    [5, 2],
+  ]);
+  m.set("S", [
+    [6, 3],
+    [7, 2],
+  ]);
+  m.set("SW", [
+    [5, 3],
+    [6, 1],
+  ]);
+  m.set("W", [
+    [4, 2],
+    [4, 3],
+  ]);
+  m.set("NW", [
+    [1, 0],
+    [1, 1],
+  ]);
+  m.set("sleeping", [
+    [2, 0],
+    [2, 1],
+  ]);
+  m.set("tired", [[3, 2]]);
+  m.set("scratchSelf", [
+    [5, 0],
+    [6, 0],
+    [7, 0],
+  ]);
+  m.set("scratchWallN", [
+    [0, 0],
+    [0, 1],
+  ]);
+  m.set("scratchWallS", [
+    [7, 1],
+    [6, 2],
+  ]);
+  m.set("scratchWallE", [
+    [2, 2],
+    [2, 3],
+  ]);
+  m.set("scratchWallW", [
+    [4, 0],
+    [4, 1],
+  ]);
+  return m;
 }
 
 /** what the two-state minimum (ADR-0007) still wants from these states. */
@@ -107,42 +192,39 @@ function el<T extends HTMLElement>(id: string, ctor: new () => T): T {
 }
 
 export function initPlayground(): void {
-  // 1 · the sheet
+  // the bench
   const drop = el("pg-drop", HTMLButtonElement);
   const dropHint = el("pg-drop-hint", HTMLSpanElement);
   const filePick = el("pg-file", HTMLInputElement);
-  const viewer = el("pg-viewer", HTMLDivElement);
+  const stage = el("pg-stage", HTMLDivElement);
   const sheetName = el("pg-name", HTMLSpanElement);
   const sheetDims = el("pg-dims", HTMLSpanElement);
   const swap = el("pg-swap", HTMLButtonElement);
-  const zoomGroup = el("pg-zoom", HTMLSpanElement);
   const frame = el("pg-frame", HTMLDivElement);
   const img = el("pg-img", HTMLImageElement);
   const overlay = el("pg-overlay", HTMLDivElement);
   const marks = el("pg-marks", HTMLDivElement);
   const cursor = el("pg-cursor", HTMLDivElement);
   const readout = el("pg-readout", HTMLSpanElement);
-  // 2 · the cells
-  const cellWInput = el("pg-cell-w", HTMLInputElement);
-  const cellHInput = el("pg-cell-h", HTMLInputElement);
-  const suggest = el("pg-suggest", HTMLDivElement);
-  const auto = el("pg-auto", HTMLButtonElement);
-  // 3 · the states
-  const chipBox = el("pg-states", HTMLDivElement);
-  const anticName = el("pg-antic-name", HTMLInputElement);
-  const anticAdd = el("pg-antic-add", HTMLButtonElement);
-  const anticErr = el("pg-antic-err", HTMLParagraphElement);
-  // 4 · the chase
   const scaleGroup = el("pg-scale", HTMLDivElement);
-  const validity = el("pg-valid", HTMLParagraphElement);
-  const chase = el("pg-chase", HTMLButtonElement);
-  // 5 · the mint, plus the quiet json secondary
+  // the mint
   const mintBtn = el("pg-mint", HTMLButtonElement);
   const mintOut = el("pg-mint-out", HTMLDivElement);
   const linkEl = el("pg-link", HTMLAnchorElement);
   const linkCopy = el("pg-link-copy", HTMLButtonElement);
   const sizeEl = el("pg-size", HTMLSpanElement);
   const sizeWarn = el("pg-size-warn", HTMLParagraphElement);
+  // the fold: hand slicer
+  const advanced = el("pg-advanced", HTMLDetailsElement);
+  const cellWInput = el("pg-cell-w", HTMLInputElement);
+  const cellHInput = el("pg-cell-h", HTMLInputElement);
+  const suggest = el("pg-suggest", HTMLDivElement);
+  const auto = el("pg-auto", HTMLButtonElement);
+  const chipBox = el("pg-states", HTMLDivElement);
+  const anticName = el("pg-antic-name", HTMLInputElement);
+  const anticAdd = el("pg-antic-add", HTMLButtonElement);
+  const anticErr = el("pg-antic-err", HTMLParagraphElement);
+  const validity = el("pg-valid", HTMLParagraphElement);
   const downloadBtn = el("pg-download", HTMLButtonElement);
   const serve = el("pg-serve", HTMLParagraphElement);
 
@@ -153,20 +235,16 @@ export function initPlayground(): void {
     url: null,
     imgW: 0,
     imgH: 0,
-    zoom: 2,
+    zoom: 1,
     cellW: 32,
     cellH: 32,
     scale: 1,
     active: "idle",
-    states: new Map<string, Cell[]>([
-      ["idle", []],
-      ["alert", []],
-      ...DIRECTIONS.map((d): [string, Cell[]] => [d, []]),
-    ]),
+    states: baseStates(),
   };
 
-  const cols = (): number => Math.floor(model.imgW / model.cellW);
-  const rows = (): number => Math.floor(model.imgH / model.cellH);
+  const cols = (): number => Math.max(1, Math.floor(model.imgW / model.cellW));
+  const rows = (): number => Math.max(1, Math.floor(model.imgH / model.cellH));
   const cw = (): number => model.cellW * model.zoom;
   const ch = (): number => model.cellH * model.zoom;
   const base = (): string =>
@@ -174,10 +252,25 @@ export function initPlayground(): void {
   const buildMap = (): FrameMap =>
     buildFrameMap(model.cellW, model.cellH, model.scale, model.states);
 
-  /** what the last mint was minted from — a new sheet or map goes stale. */
   const signature = (): string =>
     `${model.url ?? ""}|${JSON.stringify(buildMap())}`;
   let mintedFor: string | null = null;
+
+  /** the sheet renders roomy enough to read and click; derived, not chosen. */
+  function fitZoom(): number {
+    if (model.imgW <= 0) return 1;
+    return Math.max(1, Math.min(8, Math.floor(512 / model.imgW)));
+  }
+
+  /** assume the standard sheet (ADR-0012): derive cells, scale, and the map. */
+  function applyStandard(): void {
+    model.cellW = Math.max(MIN_CELL, Math.floor(model.imgW / STD_COLS));
+    model.cellH = Math.max(MIN_CELL, Math.floor(model.imgH / STD_ROWS));
+    model.scale = autoScale(model.cellH);
+    model.states = standardStates();
+    model.active = "idle";
+    prune();
+  }
 
   /** cells that fell off the grid after a resize don't linger in any state. */
   function prune(): void {
@@ -198,10 +291,24 @@ export function initPlayground(): void {
     }
   }
 
-  function renderViewer(): void {
+  // -- live preview: any legal change sets the pet loose, debounced ----------
+
+  let previewTimer = 0;
+  function schedulePreview(): void {
+    if (model.url === null || missingStates(model.states).length > 0) return;
+    clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(() => {
+      if (model.url)
+        window.companion.preview(model.url, buildMap(), model.scale);
+    }, 120);
+  }
+
+  // -- render ----------------------------------------------------------------
+
+  function renderStage(): void {
     const loaded = model.url !== null;
     drop.classList.toggle("hidden", loaded);
-    viewer.classList.toggle("hidden", !loaded);
+    stage.classList.toggle("hidden", !loaded);
     auto.disabled = !loaded;
     if (!loaded) return;
     const w = model.imgW * model.zoom;
@@ -212,13 +319,13 @@ export function initPlayground(): void {
     frame.style.height = `${h}px`;
     overlay.style.width = `${cols() * cw()}px`;
     overlay.style.height = `${rows() * ch()}px`;
+    overlay.style.cursor = advanced.open ? "crosshair" : "default";
     overlay.style.backgroundImage =
       "linear-gradient(to right, rgb(0 0 0 / 0.25) 1px, transparent 1px), " +
       "linear-gradient(to bottom, rgb(0 0 0 / 0.25) 1px, transparent 1px)";
     overlay.style.backgroundSize = `${cw()}px ${ch()}px`;
     sheetName.textContent = model.file?.name ?? "";
-    sheetDims.textContent = `${model.imgW}×${model.imgH}px · ${cols()}×${rows()} cells`;
-    pressGroup(zoomGroup, "zoom", model.zoom);
+    sheetDims.textContent = `· ${cols()}×${rows()} cells`;
   }
 
   function renderCellInputs(): void {
@@ -232,7 +339,7 @@ export function initPlayground(): void {
 
   function renderMarks(): void {
     marks.replaceChildren();
-    if (model.url === null) return;
+    if (model.url === null || !advanced.open) return;
     const w = cw();
     const h = ch();
     const place = (m: HTMLElement, c: number, r: number): void => {
@@ -243,7 +350,6 @@ export function initPlayground(): void {
     };
     const active = model.states.get(model.active) ?? [];
     const activeKeys = new Set(active.map(([c, r]) => `${c},${r}`));
-    // cells already dealt to other states: a faint ink claim
     const seen = new Set<string>();
     for (const [name, cells] of model.states) {
       if (name === model.active) continue;
@@ -259,7 +365,6 @@ export function initPlayground(): void {
         marks.appendChild(m);
       }
     }
-    // the active state's cells, numbered in deal order — an amber claim
     active.forEach(([c, r], i) => {
       const m = document.createElement("div");
       m.className = "absolute";
@@ -328,16 +433,15 @@ export function initPlayground(): void {
     if (model.url === null) {
       validity.className = "label opacity-60";
       validity.textContent =
-        "waiting on a sheet — idle plus one run direction makes a companion (ADR-0007).";
+        "waiting on a sheet — idle plus one run direction makes a companion.";
     } else if (!legal) {
       validity.className = "label";
-      validity.textContent = `not legal yet — missing ${miss.join(" and ")} (ADR-0007).`;
+      validity.textContent = `not legal yet — missing ${miss.join(" and ")}.`;
     } else {
       validity.className = "label";
       validity.textContent =
-        "legal — idle plus a run direction. missing directions resolve down the ladder.";
+        "legal — missing directions resolve down the ladder.";
     }
-    chase.disabled = !(legal && model.url !== null);
   }
 
   function renderExport(): void {
@@ -348,7 +452,6 @@ export function initPlayground(): void {
     serve.textContent = model.file
       ? `serve ${base()}.json next to ${model.file.name} and point data-frame-map at it.`
       : "serve the json next to the image and point data-frame-map at it.";
-    // a minted link goes stale the moment the sheet or the map changes
     if (mintedFor !== null && mintedFor !== signature()) {
       mintedFor = null;
       mintOut.classList.add("hidden");
@@ -356,16 +459,17 @@ export function initPlayground(): void {
   }
 
   function renderAll(): void {
-    renderViewer();
+    renderStage();
     renderCellInputs();
     renderChips();
     renderMarks();
     pressGroup(scaleGroup, "scale", model.scale);
     renderValidity();
     renderExport();
+    schedulePreview();
   }
 
-  // -- the sheet ------------------------------------------------------------
+  // -- the sheet -------------------------------------------------------------
 
   function loadFile(f: File): void {
     if (!ACCEPT.has(f.type)) {
@@ -384,13 +488,11 @@ export function initPlayground(): void {
       model.url = url;
       model.imgW = probe.naturalWidth;
       model.imgH = probe.naturalHeight;
+      model.zoom = fitZoom();
       if (sameDims) {
         prune();
       } else {
-        for (const key of model.states.keys()) model.states.set(key, []);
-        model.active = "idle";
-        model.cellW = guessCell(model.imgW);
-        model.cellH = guessCell(model.imgH);
+        applyStandard();
       }
       dropHint.textContent = defaultHint;
       img.src = url;
@@ -411,7 +513,7 @@ export function initPlayground(): void {
     filePick.value = "";
   });
 
-  for (const target of [drop, viewer] as HTMLElement[]) {
+  for (const target of [drop, stage] as HTMLElement[]) {
     target.addEventListener("dragover", (e) => {
       e.preventDefault();
       target.style.backgroundColor = "rgb(0 0 0 / 0.08)";
@@ -427,17 +529,7 @@ export function initPlayground(): void {
     });
   }
 
-  zoomGroup.addEventListener("click", (e) => {
-    const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-zoom]");
-    if (!btn) return;
-    const z = Number(btn.dataset["zoom"]);
-    if (!Number.isFinite(z)) return;
-    model.zoom = z;
-    renderViewer();
-    renderMarks();
-  });
-
-  // -- the grid -------------------------------------------------------------
+  // -- the grid (advanced) ---------------------------------------------------
 
   function cellAt(e: MouseEvent): Cell | null {
     if (cw() <= 0 || ch() <= 0) return null;
@@ -449,6 +541,7 @@ export function initPlayground(): void {
   }
 
   overlay.addEventListener("click", (e) => {
+    if (!advanced.open) return;
     const cell = cellAt(e);
     if (!cell) return;
     const cells = model.states.get(model.active);
@@ -460,9 +553,11 @@ export function initPlayground(): void {
     renderChips();
     renderValidity();
     renderExport();
+    schedulePreview();
   });
 
   overlay.addEventListener("mousemove", (e) => {
+    if (!advanced.open) return;
     const cell = cellAt(e);
     if (!cell) {
       cursor.classList.add("hidden");
@@ -487,7 +582,12 @@ export function initPlayground(): void {
     readout.textContent = "hover a cell";
   });
 
-  // -- the cells ------------------------------------------------------------
+  advanced.addEventListener("toggle", () => {
+    renderStage();
+    renderMarks();
+  });
+
+  // -- cell size (advanced) --------------------------------------------------
 
   function commitCell(input: HTMLInputElement, axis: "w" | "h"): void {
     const v = Math.floor(Number(input.value));
@@ -528,7 +628,7 @@ export function initPlayground(): void {
     renderAll();
   });
 
-  // -- the states -----------------------------------------------------------
+  // -- states (advanced) -----------------------------------------------------
 
   function addAntic(): void {
     const raw = anticName.value.trim();
@@ -549,7 +649,6 @@ export function initPlayground(): void {
     anticErr.textContent = "";
     model.states.set(raw, []);
     model.active = raw;
-    anticName.value = "";
     renderChips();
     renderMarks();
     renderExport();
@@ -567,7 +666,7 @@ export function initPlayground(): void {
     anticErr.textContent = "";
   });
 
-  // -- the chase ------------------------------------------------------------
+  // -- the size (scale) ------------------------------------------------------
 
   scaleGroup.addEventListener("click", (e) => {
     const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-scale]");
@@ -577,19 +676,10 @@ export function initPlayground(): void {
     model.scale = n;
     pressGroup(scaleGroup, "scale", model.scale);
     renderExport();
+    schedulePreview();
   });
 
-  chase.addEventListener("click", () => {
-    if (model.url === null) return;
-    window.companion.preview(model.url, buildMap(), model.scale);
-    const was = chase.textContent;
-    chase.textContent = "it's loose";
-    setTimeout(() => {
-      chase.textContent = was;
-    }, 900);
-  });
-
-  // -- the mint (ADR-0011) ----------------------------------------------------
+  // -- the mint (ADR-0011) ---------------------------------------------------
 
   mintBtn.addEventListener("click", () => {
     const file = model.file;
@@ -619,7 +709,7 @@ export function initPlayground(): void {
     reader.readAsDataURL(file);
   });
 
-  // -- the json secondary -----------------------------------------------------
+  // -- the json secondary (advanced) -----------------------------------------
 
   downloadBtn.addEventListener("click", () => {
     if (model.file === null) return;

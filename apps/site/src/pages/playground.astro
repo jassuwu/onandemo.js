@@ -5,33 +5,28 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout
   title="onandemo.js — the playground"
-  description="turn any image into a sheet and a frame map in your tab, set it chasing for real, then mint it into a companion link. nothing uploads."
+  description="drop a recipe sheet and your pet is chasing your cursor instantly, then mint it into a link. nothing uploads — it all runs in your tab."
 >
-  <main class="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
+  <main class="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:px-6">
     <!-- intro -->
-    <Window title="the playground" class="max-w-3xl">
+    <Window title="the playground">
       <h1 class="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-        slice anything. set it loose.
+        drop a pet. it's loose.
       </h1>
       <p class="mt-4">
-        drop an image, slice it into cells, deal the cells to states. the moment
-        the frame map is legal, your companion chases your cursor — on this
-        page, for real — and mints into a link you can send anywhere. nothing
-        uploads; the whole bench runs in your tab.
-      </p>
-      <p class="mt-3 text-sm">
-        no art yet? <a href="/recipe" class="prose-link">the recipe</a> prompts your
-        image model.
+        drop a sheet from <a href="/recipe" class="prose-link">the recipe</a> and
+        your companion chases your cursor — instantly, no slicing. then mint it into
+        a link you can send anywhere. nothing uploads; it all runs in your tab.
       </p>
       <noscript>
         <p class="label mt-4">
-          the playground slices in your tab — it needs javascript.
+          the playground runs in your tab — it needs javascript.
         </p>
       </noscript>
     </Window>
 
-    <!-- the sheet -->
-    <Window title="the sheet">
+    <!-- the bench -->
+    <Window title="your companion">
       <input
         id="pg-file"
         type="file"
@@ -39,60 +34,31 @@ import Layout from "../layouts/Layout.astro";
         class="hidden"
       />
 
+      <!-- drop state -->
       <button
         id="pg-drop"
         type="button"
         class="border-ink hover:bg-ink/5 block w-full cursor-pointer border-2 border-dashed px-6 py-16 text-center"
       >
-        <span class="label">drop a sheet here</span>
+        <span class="label">drop your sheet here</span>
         <span class="mt-2 block text-sm">or click to pick a file</span>
         <span id="pg-drop-hint" class="label mt-4 block opacity-60">
-          png / gif / webp · a uniform grid of cells works best
+          png / gif / webp · made with the recipe works best
         </span>
       </button>
 
-      <div id="pg-viewer" class="hidden">
+      <!-- loaded state -->
+      <div id="pg-stage" class="hidden">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <span class="label min-w-0">
-            <span id="pg-name"></span>
-            <span id="pg-dims" class="ml-2 opacity-60"></span>
+          <span class="label">
+            <span class="text-amber-deep">●</span> it's chasing your cursor —
+            <span id="pg-name" class="font-bold"></span>
+            <span id="pg-dims" class="opacity-60"></span>
           </span>
-          <span class="flex flex-wrap items-center gap-3">
-            <span
-              id="pg-zoom"
-              class="flex gap-1"
-              role="group"
-              aria-label="zoom"
-            >
-              <button
-                class="btn"
-                type="button"
-                data-zoom="1"
-                aria-pressed="false">1x</button
-              >
-              <button
-                class="btn"
-                type="button"
-                data-zoom="2"
-                aria-pressed="true">2x</button
-              >
-              <button
-                class="btn"
-                type="button"
-                data-zoom="3"
-                aria-pressed="false">3x</button
-              >
-              <button
-                class="btn"
-                type="button"
-                data-zoom="4"
-                aria-pressed="false">4x</button
-              >
-            </span>
-            <button id="pg-swap" class="btn" type="button">swap</button>
-          </span>
+          <button id="pg-swap" class="btn" type="button">swap</button>
         </div>
-        <div class="mt-4 max-h-[70vh] overflow-auto pb-2">
+
+        <div class="mt-4 max-h-[60vh] overflow-auto pb-2">
           <div id="pg-frame" class="border-ink relative border-2 select-none">
             <img
               id="pg-img"
@@ -101,7 +67,7 @@ import Layout from "../layouts/Layout.astro";
               style="image-rendering: pixelated;"
               draggable="false"
             />
-            <div id="pg-overlay" class="absolute top-0 left-0 cursor-crosshair">
+            <div id="pg-overlay" class="absolute top-0 left-0">
               <div id="pg-marks" class="pointer-events-none absolute inset-0">
               </div>
               <div
@@ -113,167 +79,161 @@ import Layout from "../layouts/Layout.astro";
             </div>
           </div>
         </div>
-        <p class="label mt-3 h-5">
-          cell: <span id="pg-readout" class="text-amber-deep">hover a cell</span
-          >
+        <p class="label mt-2 h-5 opacity-60">
+          cell: <span id="pg-readout">hover a cell</span>
         </p>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <span class="label">size</span>
+          <div id="pg-scale" class="flex gap-1" role="group" aria-label="scale">
+            <button class="btn" type="button" data-scale="1" aria-pressed="true"
+              >1x</button
+            >
+            <button
+              class="btn"
+              type="button"
+              data-scale="2"
+              aria-pressed="false">2x</button
+            >
+            <button
+              class="btn"
+              type="button"
+              data-scale="3"
+              aria-pressed="false">3x</button
+            >
+            <button
+              class="btn"
+              type="button"
+              data-scale="4"
+              aria-pressed="false">4x</button
+            >
+          </div>
+        </div>
+
+        <!-- the mint -->
+        <div class="border-ink/30 mt-6 border-t-2 pt-5">
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="pg-mint" class="btn-amber" type="button"
+              >mint a link</button
+            >
+            <span class="label opacity-60"
+              >fold the whole pet into one link</span
+            >
+          </div>
+          <div id="pg-mint-out" class="border-ink mt-4 hidden border-2 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <span class="label">your companion, link-shaped</span>
+              <button id="pg-link-copy" class="btn" type="button"
+                >copy link</button
+              >
+            </div>
+            <p class="mt-3">
+              <a
+                id="pg-link"
+                href=""
+                class="prose-link font-mono text-sm break-all"></a>
+            </p>
+            <p class="label mt-3"><span id="pg-size"></span></p>
+            <p id="pg-size-warn" class="mt-2 hidden text-sm">
+              tiny sheets travel best — chat apps truncate long links.
+            </p>
+            <p class="mt-2 text-sm">
+              nothing was uploaded — the creature lives in the link itself.
+            </p>
+          </div>
+        </div>
       </div>
     </Window>
 
-    <!-- the map: cells, states, chase -->
-    <div class="grid items-start gap-10 lg:grid-cols-[1fr_1.3fr_1fr]">
-      <Window title="the cells">
-        <div class="flex items-center gap-2">
-          <label class="flex items-center gap-2 font-mono text-sm">
-            w
-            <input
-              id="pg-cell-w"
-              type="number"
-              min="4"
-              step="1"
-              value="32"
-              class="border-ink bg-paper w-20 border-2 px-2 py-1 font-mono text-sm"
-            />
-          </label>
-          <span class="font-mono text-sm">×</span>
-          <label class="flex items-center gap-2 font-mono text-sm">
-            h
-            <input
-              id="pg-cell-h"
-              type="number"
-              min="4"
-              step="1"
-              value="32"
-              class="border-ink bg-paper w-20 border-2 px-2 py-1 font-mono text-sm"
-            />
-          </label>
-        </div>
-        <div id="pg-suggest" class="mt-4 flex flex-wrap gap-2">
-          <button class="btn" type="button" data-cell="16">16</button>
-          <button class="btn" type="button" data-cell="32">32</button>
-          <button class="btn" type="button" data-cell="48">48</button>
-          <button class="btn" type="button" data-cell="64">64</button>
-          <button id="pg-auto" class="btn" type="button" disabled
-            >auto-guess</button
-          >
-        </div>
-        <p class="mt-4 text-sm">
-          auto-guess reads the image's divisors and aims near 32. the grid
-          redraws as you type.
-        </p>
-      </Window>
-
-      <Window title="the states">
+    <!-- advanced: the manual slicer, for non-recipe art -->
+    <details id="pg-advanced" class="window">
+      <summary
+        class="window-title cursor-pointer list-none"
+        style="justify-content: flex-start; padding-left: 16px;"
+      >
+        <span class="title-chip">different layout? slice it by hand</span>
+      </summary>
+      <div class="space-y-6 p-5">
         <p class="text-sm">
-          select a state, then click cells on the sheet above in the order they
-          should play. click a numbered cell to take it back.
+          dropped something that isn't a recipe sheet? set the cell size, pick a
+          state, then click cells on the sheet above in the order they play.
+          idle plus one direction is a legal pet (ADR-0007).
         </p>
-        <div id="pg-states" class="mt-4 flex flex-wrap gap-2"></div>
-        <div class="mt-5 flex gap-2">
-          <input
-            id="pg-antic-name"
-            type="text"
-            placeholder="antic name — sleep, spin, melt"
-            class="border-ink bg-paper placeholder:text-ink/50 min-w-0 flex-1 border-2 px-2 py-1 font-mono text-sm"
-          />
-          <button id="pg-antic-add" class="btn shrink-0" type="button"
-            >add antic</button
-          >
-        </div>
-        <p id="pg-antic-err" class="label mt-2 h-4"></p>
-        <p class="mt-2 text-sm">
-          idle and the directions drive the chase; any other name is an antic —
-          a rare idle performance.
-        </p>
-      </Window>
 
-      <Window title="the chase">
-        <span class="label">scale</span>
-        <div
-          id="pg-scale"
-          class="mt-3 flex flex-wrap gap-2"
-          role="group"
-          aria-label="scale"
-        >
-          <button class="btn" type="button" data-scale="1" aria-pressed="true"
-            >1x</button
-          >
-          <button class="btn" type="button" data-scale="2" aria-pressed="false"
-            >2x</button
-          >
-          <button class="btn" type="button" data-scale="3" aria-pressed="false"
-            >3x</button
-          >
-          <button class="btn" type="button" data-scale="4" aria-pressed="false"
-            >4x</button
-          >
+        <div>
+          <span class="label">cell size</span>
+          <div class="mt-3 flex items-center gap-2">
+            <label class="flex items-center gap-2 font-mono text-sm">
+              w
+              <input
+                id="pg-cell-w"
+                type="number"
+                min="4"
+                step="1"
+                value="32"
+                class="border-ink bg-paper w-20 border-2 px-2 py-1 font-mono text-sm"
+              />
+            </label>
+            <span class="font-mono text-sm">×</span>
+            <label class="flex items-center gap-2 font-mono text-sm">
+              h
+              <input
+                id="pg-cell-h"
+                type="number"
+                min="4"
+                step="1"
+                value="32"
+                class="border-ink bg-paper w-20 border-2 px-2 py-1 font-mono text-sm"
+              />
+            </label>
+            <div id="pg-suggest" class="ml-2 flex flex-wrap gap-2">
+              <button class="btn" type="button" data-cell="16">16</button>
+              <button class="btn" type="button" data-cell="32">32</button>
+              <button class="btn" type="button" data-cell="64">64</button>
+              <button id="pg-auto" class="btn" type="button" disabled
+                >guess</button
+              >
+            </div>
+          </div>
         </div>
-        <p class="mt-3 text-sm">
-          display multiplier — cells stay crisp at any size.
-        </p>
-        <div class="border-ink/30 my-5 border-t-2"></div>
+
+        <div>
+          <span class="label">states</span>
+          <div id="pg-states" class="mt-3 flex flex-wrap gap-2"></div>
+          <div class="mt-4 flex gap-2">
+            <input
+              id="pg-antic-name"
+              type="text"
+              placeholder="antic name — sleep, spin, melt"
+              class="border-ink bg-paper placeholder:text-ink/50 min-w-0 flex-1 border-2 px-2 py-1 font-mono text-sm"
+            />
+            <button id="pg-antic-add" class="btn shrink-0" type="button"
+              >add antic</button
+            >
+          </div>
+          <p id="pg-antic-err" class="label mt-2 h-4"></p>
+        </div>
+
         <p id="pg-valid" class="label opacity-60">
-          waiting on a sheet — idle plus one run direction makes a companion
-          (ADR-0007).
+          waiting on a sheet — idle plus one run direction makes a companion.
         </p>
-        <button
-          id="pg-chase"
-          class="btn-amber mt-4 w-full"
-          type="button"
-          disabled>chase me</button
-        >
-      </Window>
-    </div>
 
-    <!-- the mint -->
-    <Window title="the mint">
-      <p class="max-w-2xl">
-        the real export: the sheet and the frame map fold into one link, and
-        whoever opens it gets chased. the link never touches a server — the
-        fragment stays in the tab.
-      </p>
-      <div class="mt-4 flex flex-wrap items-center gap-3">
-        <button id="pg-mint" class="btn-amber" type="button" disabled
-          >mint a link</button
-        >
-        <span class="label opacity-60"
-          >lights up when the frame map is legal</span
-        >
-      </div>
-
-      <div id="pg-mint-out" class="border-ink mt-5 hidden border-2 p-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <span class="label">your companion, link-shaped</span>
-          <button id="pg-link-copy" class="btn" type="button">copy link</button>
+        <div class="border-ink/30 border-t-2 pt-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-sm"
+              >or take the json for <code class="font-mono">data-frame-map</code
+              ></span
+            >
+            <button id="pg-download" class="btn" type="button" disabled
+              >download</button
+            >
+          </div>
+          <p id="pg-serve" class="label mt-2 opacity-60">
+            serve the json next to the image and point data-frame-map at it.
+          </p>
         </div>
-        <p class="mt-3">
-          <a id="pg-link" href="" class="prose-link font-mono text-sm break-all"
-          ></a>
-        </p>
-        <p class="label mt-3"><span id="pg-size"></span></p>
-        <p id="pg-size-warn" class="mt-2 hidden text-sm">
-          tiny sheets travel best — chat apps truncate long links.
-        </p>
-        <p class="mt-2 text-sm">
-          nothing was uploaded — the creature lives in the link itself.
-        </p>
       </div>
-
-      <div class="border-ink/30 mt-6 border-t-2 pt-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <span class="text-sm"
-            >or take the json for <code class="font-mono">data-frame-map</code
-            ></span
-          >
-          <button id="pg-download" class="btn" type="button" disabled
-            >download</button
-          >
-        </div>
-        <p id="pg-serve" class="label mt-2 opacity-60">
-          serve the json next to the image and point data-frame-map at it.
-        </p>
-      </div>
-    </Window>
+    </details>
   </main>
 
   <script>
@@ -298,6 +258,12 @@ import Layout from "../layouts/Layout.astro";
     .btn:disabled:active,
     .btn-amber:disabled:active {
       translate: none;
+    }
+    #pg-advanced summary::-webkit-details-marker {
+      display: none;
+    }
+    #pg-advanced[open] summary {
+      border-bottom: 2px solid var(--color-ink);
     }
   </style>
 </Layout>
